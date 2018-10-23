@@ -12,24 +12,48 @@
  *
  */
 
+#include <components/core/defs.h>
+#include <components/core/string.h>
 #include <iostream>
+#include <vector>
 
 #include "poppler-document.h"
 #include "poppler-page.h"
 using namespace std;
 
-
 /*---[ Implement ]----------------------------------------------------------------------------------*/
+
+static PwPET::string toString(poppler::ustring str){
+
+	if(!str.length()) {
+		return PwPET::string();
+	}
+
+    auto buf = str.to_utf8();
+
+	return PwPET::string(buf.data(), buf.size());
+
+}
 
 int main(int argc, const char *argv[]) {
 
 	poppler::document *doc = poppler::document::load_from_file("./sample.pdf");
 
 	const int pagesNbr = doc->pages();
-	cout << "page count: " << pagesNbr << endl;
 
 	for (int i = 0; i < pagesNbr; ++i) {
-		cout << doc->create_page(i)->text().to_latin1().c_str() << endl;
+
+		std::vector<PwPET::string> text;
+		toString(doc->create_page(i)->text()).split(text,'\n');
+
+		for(auto ln = text.begin(); ln != text.end(); ln++) {
+			ln->strip();
+		}
+
+		for(auto ln : text) {
+			cout << ln << endl;
+		}
+
 	}
 
 	return 0;

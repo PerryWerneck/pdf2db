@@ -41,6 +41,8 @@
 		<Linker>
 			<Add option="`pkg-config --libs poppler-cpp`" />
 		</Linker>
+		<Unit filename="src/components/components/core/defs.h" />
+		<Unit filename="src/components/components/core/string.h" />
 		<Unit filename="src/components/core/log.cc" />
 		<Unit filename="src/components/core/storedstring.cc" />
 		<Unit filename="src/components/core/string/get.cc" />
