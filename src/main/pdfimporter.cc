@@ -50,8 +50,8 @@ int main(int argc, const char *argv[]) {
 			ln->strip();
 		}
 
-		for(auto ln : text) {
-			cout << ln << endl;
+		for(size_t l = 0; l < text.size(); l++) {
+			cout << "P:" << (i+1) << " L:" << (l+1) << "=" << text[l] << endl;
 		}
 
 	}

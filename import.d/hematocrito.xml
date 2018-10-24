@@ -1,0 +1,18 @@
+<!--
+
+	Configuração para importação de exames
+
+-->
+
+<pdfimport>
+
+	<exam name='Hematócrito'>
+
+		<filter page='1' line='1' type='text' value='Clínica Prontovet' />
+		<filter page='1' line='1' type='text' value='Hematócrito' />
+
+
+	</exam>
+
+
+</pdfimport>
