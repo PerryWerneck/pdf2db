@@ -12,31 +12,24 @@
  *
  */
 
-#include <components/core/defs.h>
-#include <components/core/string.h>
+#include <pdfimporter.h>
 #include <iostream>
 #include <vector>
 
-#include "poppler-document.h"
-#include "poppler-page.h"
 using namespace std;
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
-static PwPET::string toString(poppler::ustring str){
-
-	if(!str.length()) {
-		return PwPET::string();
-	}
-
-    auto buf = str.to_utf8();
-
-	return PwPET::string(buf.data(), buf.size());
-
-}
-
 int main(int argc, const char *argv[]) {
 
+	PDFImporter::Document file("./sample.pdf");
+
+	file.forEach([](const char *line) {
+		cout << line << endl;
+		return true;
+	});
+
+	/*
 	poppler::document *doc = poppler::document::load_from_file("./sample.pdf");
 
 	const int pagesNbr = doc->pages();
@@ -55,6 +48,7 @@ int main(int argc, const char *argv[]) {
 		}
 
 	}
+	*/
 
 	return 0;
 
