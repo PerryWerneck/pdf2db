@@ -11,7 +11,9 @@
  */
 
  #include <pdfimporter.h>
+ #include <regex>
 
+ using namespace std;
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
@@ -21,16 +23,17 @@
  	/// @brief Filtro para selecionar por todo o conteúdo de uma linha dentro de uma página
  	class LineFilter : public PDFImporter::Filter {
 	private:
-		string text;
-		unsigned int page;
-		unsigned int line;
+		regex			filter;
+		unsigned int	page;
+		unsigned int	line;
 
 	public:
 		LineFilter(const XMLNode &node) {
 
 			page = node.attribute("page").as_uint(1);
 			line = node.attribute("line").as_uint(1);
-			text = node.attribute("value").as_string();
+
+			filter = node.attribute("value").as_string();
 
 		}
 
@@ -38,14 +41,13 @@
 		}
 
 		bool test(const Document &document) override {
-			debug("%s/%s=%d",text.c_str(),document.get(page,line),strcasecmp(document.get(page,line),text.c_str()));
-			return strcasecmp(document.get(page,line),text.c_str()) == 0;
+			return regex_match(document.get(page,line),filter);
 		}
 
  	};
 
 
- 	switch(string(node.attribute("type").as_string("text")).select("text","regex",nullptr)) {
+ 	switch(APPNAME::string(node.attribute("type").as_string("text")).select("text","regex",nullptr)) {
 	case 0:
 		return new LineFilter(node);
 

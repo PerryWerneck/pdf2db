@@ -11,7 +11,7 @@
  */
 
  #include <pdfimporter.h>
-
+ #include <regex>
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
@@ -22,35 +22,25 @@
  /// @brief Cria conteúdo de acordo com a descrição XML.
  PDFImporter::Content * PDFImporter::Content::create(const XMLNode &node) {
 
-	/// @brief Elemento para extrair um bloco de texto.
-	class TextBlockContent : public Content {
+	/// @brief Filtra linhas de texto.
+	class RegexDelimitedBlock : public Content {
 	private:
-		string from;
-		string to;
+		std::regex	from;
+		std::regex	to;
 		unsigned int page;
-		string text;
 
 	protected:
 
-		virtual void onTextLine(const char *line) {
-			if(!text.empty()) {
-				text += "\n";
-			}
-			text += line;
-		}
+		/// @brief Método chamado quando encontra as linhas a filtrar.
+		virtual void onTextLine(const char *line) = 0;
 
-	public:
-		TextBlockContent(const XMLNode &node) : Content(node) {
+		RegexDelimitedBlock(const XMLNode &node) : Content(node) {
 			from = node.attribute("begin").as_string();
 			to = node.attribute("end").as_string();
 			page = node.attribute("page").as_uint(1);
 		}
 
-		virtual ~TextBlockContent() {
-		}
-
-		void reset() override {
-			text.clear();
+		virtual ~RegexDelimitedBlock() {
 		}
 
 		/// @brief Extrai conteúdo do documento.
@@ -62,26 +52,59 @@
 
 				if(loading) {
 
-					if(string(line).hasPrefix(to.c_str())) {
+					if(regex_match(line,to)) {
+						loading = false;
+						debug("%s: Achei final (%s)",getName().c_str(),string(line).strip().c_str());
 						return false;
 					}
 
 					debug("[%s]",line);
 					onTextLine(line);
 
-				} else if(string(line).hasPrefix(from.c_str())) {
+				} else if(regex_match(line,from)) {
+					debug("%s: Achei inicio (%s)",getName().c_str(),string(line).strip().c_str());
 					loading = true;
 				}
 
 				return true;
 			});
 
-			text.strip();
-
-			debug("Achei \"%s\":\n%s\n",getName().c_str(),text.c_str());
 			return true;
 		}
 
+	};
+
+	/// @brief Elemento para extrair um bloco de texto.
+	class TextBlockContent : public RegexDelimitedBlock {
+	private:
+		string text;
+
+	protected:
+
+		void onTextLine(const char *line) override {
+			if(!text.empty()) {
+				text += "\n";
+			}
+			text += line;
+		}
+
+	public:
+		TextBlockContent(const XMLNode &node) : RegexDelimitedBlock(node) {
+		}
+
+		virtual ~TextBlockContent() {
+		}
+
+		void reset() override {
+			text.clear();
+		}
+
+		bool set(const Document &document) override {
+			RegexDelimitedBlock::set(document);
+			text.strip();
+			debug("%s=\n%s",getName().c_str(),text.c_str());
+			return !text.empty();
+		}
 	};
 
  	switch(string(node.attribute("type").as_string("text-block")).select("text-block","regex",nullptr)) {

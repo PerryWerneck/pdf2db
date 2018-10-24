@@ -8,15 +8,15 @@
 
 	<procedure name='Hematócrito' type='exame'>
 
-		<filter page='1' line='1' type='text' value='Clínica Prontovet' />
-		<filter page='1' line='4' type='text' value='Hematócrito' />
+		<filter page='1' line='1' type='text' value='^Clínica Prontovet' />
+		<filter page='1' line='4' type='text' value='^Hematócrito' />
 
-		<property name='resultado' type='text-block' page='1' begin='Resultado' end='Horário'>
+		<property name='resultado' type='text-block' page='1' begin='^Resultado$' end='^Horário.*'>
 
 
 		</property>
 
-		<property name='conclusoes' type='text-block' page='1' begin='Conclusões' end='Exame realizado'>
+		<property name='conclusoes' type='text-block' page='1' begin='^Conclusões$' end='^Exame realizado o dia.*'>
 
 
 		</property>
