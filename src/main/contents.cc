@@ -17,6 +17,7 @@
 
  PDFImporter::Content::Content(const XMLNode &node) {
  	this->name = node.attribute("name").as_string();
+	this->page = node.attribute("page").as_uint(1);
  }
 
  /// @brief Cria conteúdo de acordo com a descrição XML.
@@ -27,7 +28,6 @@
 	private:
 		std::regex	from;
 		std::regex	to;
-		unsigned int page;
 
 	protected:
 
@@ -37,7 +37,6 @@
 		RegexDelimitedBlock(const XMLNode &node) : Content(node) {
 			from = node.attribute("begin").as_string();
 			to = node.attribute("end").as_string();
-			page = node.attribute("page").as_uint(1);
 		}
 
 		virtual ~RegexDelimitedBlock() {
@@ -107,12 +106,75 @@
 		}
 	};
 
+	/// @brief Elemento para extrair um valor
+	class RegexExtractedValue : public Content {
+	private:
+		std::regex expression;
+		unsigned int line;
+
+		/// @brief Método chamado quando encontra as linhas a filtrar.
+		virtual void onExtractedResult(size_t index, const char *result) {
+			debug("%s(%u)=\"%s\"",getName().c_str(),(unsigned int) index, result);
+		}
+
+
+	public:
+		RegexExtractedValue(const XMLNode &node) : Content(node) {
+			expression = node.attribute("expression").as_string();
+			line = node.attribute("line").as_uint(0);
+		}
+
+		virtual ~RegexExtractedValue() {
+		}
+
+		void reset() override {
+		}
+
+		bool set(const Document &document) override {
+
+			if(line) {
+
+				// Tem linha pesquiso só ela.
+				std::smatch match;
+
+				if(std::regex_search(document.getString(page,line), match, this->expression)) {
+					for(size_t ix = 1; ix < match.size();ix++) {
+						onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
+					}
+				}
+
+			} else {
+
+				// Não tem linha, pesquiso a página toda.
+				document.forEach([this](const char *line) {
+
+					std::smatch match;
+					string str = line;
+
+					if(std::regex_search(str, match, this->expression)) {
+						for(size_t ix = 1; ix < match.size();ix++) {
+							onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
+						}
+						return false;
+					}
+
+					return true;
+
+				});
+
+			}
+
+			return true;
+		}
+	};
+
  	switch(string(node.attribute("type").as_string("text-block")).select("text-block","regex",nullptr)) {
 	case 0:
 		return new TextBlockContent(node);
 
 	case 1:
-		break;
+		return new RegexExtractedValue(node);
+
  	}
 
  	throw EINVAL;

@@ -47,7 +47,11 @@
 
 			bool forEach(std::function<bool(const char *line)> callback) const;
 
-			const char * get(unsigned int page, unsigned int line) const;
+			const string & getString(unsigned int page, unsigned int line) const;
+
+			inline const char * get(unsigned int page, unsigned int line) const {
+				return getString(page,line).c_str();
+			}
 
 
 		};
@@ -72,10 +76,15 @@
 		/// @brief Valor extraido do documento.
 		class Content {
 		private:
+
+			/// @brief Nome da propriedade
 			string name;
 
 		protected:
 			Content(const XMLNode &node);
+
+			/// @brief De que página será extraída.
+			unsigned int page;
 
 		public:
 

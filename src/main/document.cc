@@ -66,7 +66,7 @@
 
  }
 
- const char * PDFImporter::Document::get(unsigned int page, unsigned int line) const {
+ const string & PDFImporter::Document::getString(unsigned int page, unsigned int line) const {
 
 	if(!(page && line)) {
 		throw EINVAL;
@@ -76,16 +76,16 @@
 	line--;
 
 	if(page > pages.size()) {
-		return "";
+		throw EINVAL;
 	}
 
 	const Page &pg = pages[page];
 
 	if(line > pg.size()) {
-		return "";
+		throw EINVAL;
 	}
 
-	return pg[line].c_str();
+	return pg[line];
 
  }
 
