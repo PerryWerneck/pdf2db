@@ -38,12 +38,13 @@
 		}
 
 		bool test(const Document &document) override {
+			debug("%s/%s=%d",text.c_str(),document.get(page,line),strcasecmp(document.get(page,line),text.c_str()));
 			return strcasecmp(document.get(page,line),text.c_str()) == 0;
 		}
 
  	};
 
- 	switch(string(node.attribute("type").as_string("text")).select("text",nullptr)) {
+ 	switch(string(node.attribute("type").as_string("text")).select("text","regex",nullptr)) {
 	case 0:
 		return new LineFilter(node);
 

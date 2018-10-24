@@ -45,7 +45,7 @@
  	// Atendeu aos filtros, extrai conteúdo.
 
 
- 	return false;
+ 	return true;
  }
 
 

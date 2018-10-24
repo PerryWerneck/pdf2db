@@ -16,6 +16,7 @@
 
 	#include <config.h>
 	#include <components/core/defs.h>
+	#include <components/core/log.h>
 	#include <components/core/string.h>
 	#include <functional>
 	#include <pugixml.hpp>

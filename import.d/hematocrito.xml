@@ -9,7 +9,7 @@
 	<procedure name='Hematócrito' type='exame'>
 
 		<filter page='1' line='1' type='text' value='Clínica Prontovet' />
-		<filter page='1' line='1' type='text' value='Hematócrito' />
+		<filter page='1' line='4' type='text' value='Hematócrito' />
 
 		<result-block page='1' begin='Resultado' end='Horário'>
 
