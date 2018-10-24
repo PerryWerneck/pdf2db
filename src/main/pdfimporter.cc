@@ -69,16 +69,8 @@ int main(int argc, const char *argv[]) {
 
 	cout << "Carreguei " << parsers.size() << " formatos de documento." << endl;
 
-
 	// Carrega arquivos PDF.
 	PDFImporter::Document file("./sample.pdf");
-
-	/*
-	file.forEach([](const char *line) {
-		cout << line << endl;
-		return true;
-	});
-	*/
 
 	for(auto parser = parsers.begin(); parser != parsers.end(); parser++) {
 

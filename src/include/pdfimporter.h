@@ -69,12 +69,43 @@
 
 		};
 
+		/// @brief Valor extraido do documento.
+		class Content {
+		private:
+			string name;
+
+		protected:
+			Content(const XMLNode &node);
+
+		public:
+
+			virtual ~Content() { }
+
+			/// @brief Cria conteúdo de acordo com a descrição XML.
+			static Content * create(const XMLNode &node);
+
+			/// @brief Extrai conteúdo do documento.
+			virtual bool set(const Document &document) = 0;
+
+			/// @brief Reinicia o parser.
+			virtual void reset() = 0;
+
+			/// @brief Obtêm o nome do valor
+			const string & getName() const {
+				return this->name;
+			}
+
+		};
+
 		/// @brief Parser de documento.
 		class Parser {
 		private:
 
 			/// @brief Lista de filtros a aplicar no documento.
 			std::vector<Filter *> filters;
+
+			/// @brief Lista de valores extraídos do documento..
+			std::vector<Content *> contents;
 
 		public:
 

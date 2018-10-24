@@ -59,6 +59,7 @@
 		<Unit filename="src/components/core/windows/registry.cc" />
 		<Unit filename="src/include/config.h" />
 		<Unit filename="src/include/pdfimporter.h" />
+		<Unit filename="src/main/contents.cc" />
 		<Unit filename="src/main/document.cc" />
 		<Unit filename="src/main/filters.cc" />
 		<Unit filename="src/main/parser.cc" />

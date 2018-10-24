@@ -20,12 +20,19 @@
 		filters.push_back(Filter::create(filter));
   	}
 
+  	for(auto property = node.child("property"); property; property = property.next_sibling("property")) {
+		contents.push_back(Content::create(property));
+  	}
  }
 
  PDFImporter::Parser::~Parser() {
 
 	for(auto filter : filters) {
 		delete filter;
+	}
+
+	for(auto content : contents) {
+		delete content;
 	}
 
  }
@@ -43,6 +50,10 @@
  	}
 
  	// Atendeu aos filtros, extrai conteúdo.
+	for(auto content : contents) {
+		content->reset();
+		content->set(document);
+	}
 
 
  	return true;

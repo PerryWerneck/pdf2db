@@ -44,10 +44,13 @@
 
  	};
 
+
  	switch(string(node.attribute("type").as_string("text")).select("text","regex",nullptr)) {
 	case 0:
 		return new LineFilter(node);
 
+	case 1:
+		break;
  	}
 
  	throw EINVAL;
