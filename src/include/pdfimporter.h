@@ -18,9 +18,11 @@
 	#include <components/core/defs.h>
 	#include <components/core/string.h>
 	#include <functional>
+	#include <pugixml.hpp>
 
 	namespace PDFImporter {
 
+		/// @brief Documento PDF já convertido para texto sem espaços.
 		class Document {
 		private:
 
@@ -41,6 +43,34 @@
 			bool forEach(std::function<bool(const char *line)> callback) const;
 
 
+
+		};
+
+		/// @brief Filtro a aplicar num documento.
+		class Filter {
+		public:
+			Filter() = default;
+			virtual ~Filter();
+
+			/// @brief Verifica se o documento atende o filtro.
+			virtual bool test(const Document &document) = 0;
+
+		};
+
+		/// @brief Parser de documento.
+		class Parser {
+		private:
+
+			/// @brief Lista de filtros a aplicar no documento.
+			std::vector<Filter *> filters;
+
+		public:
+
+			Parser(const pugi::xml_node &node);
+			~Parser();
+
+			/// @brief Faz o parse do documento.
+			bool set(const Document &document);
 
 		};
 

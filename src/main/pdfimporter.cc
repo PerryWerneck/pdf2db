@@ -29,27 +29,6 @@ int main(int argc, const char *argv[]) {
 		return true;
 	});
 
-	/*
-	poppler::document *doc = poppler::document::load_from_file("./sample.pdf");
-
-	const int pagesNbr = doc->pages();
-
-	for (int i = 0; i < pagesNbr; ++i) {
-
-		std::vector<PwPET::string> text;
-		toString(doc->create_page(i)->text()).split(text,'\n');
-
-		for(auto ln = text.begin(); ln != text.end(); ln++) {
-			ln->strip();
-		}
-
-		for(size_t l = 0; l < text.size(); l++) {
-			cout << "P:" << (i+1) << " L:" << (l+1) << "=" << text[l] << endl;
-		}
-
-	}
-	*/
-
 	return 0;
 
 }
