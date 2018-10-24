@@ -20,13 +20,17 @@
 	#include <functional>
 	#include <pugixml.hpp>
 
+	using APPNAME::string;
+	using std::vector;
+	using XMLNode = pugi::xml_node;
+
 	namespace PDFImporter {
 
 		/// @brief Documento PDF já convertido para texto sem espaços.
 		class Document {
 		private:
 
-			class Page : public std::vector<PwPET::string> {
+			class Page : public std::vector<string> {
 			private:
 				friend class PDFImporter::Document;
 
@@ -42,15 +46,22 @@
 
 			bool forEach(std::function<bool(const char *line)> callback) const;
 
+			const char * get(unsigned int page, unsigned int line) const;
 
 
 		};
 
 		/// @brief Filtro a aplicar num documento.
 		class Filter {
-		public:
+		protected:
 			Filter() = default;
-			virtual ~Filter();
+
+		public:
+
+			/// @brief Cria filtro de acordo com a descrição XML.
+			static Filter * create(const XMLNode &node);
+
+			virtual ~Filter() {};
 
 			/// @brief Verifica se o documento atende o filtro.
 			virtual bool test(const Document &document) = 0;
@@ -66,7 +77,7 @@
 
 		public:
 
-			Parser(const pugi::xml_node &node);
+			Parser(const XMLNode &node);
 			~Parser();
 
 			/// @brief Faz o parse do documento.

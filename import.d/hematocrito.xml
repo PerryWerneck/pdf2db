@@ -6,7 +6,7 @@
 
 <pdfimport>
 
-	<parser name='Hematócrito'>
+	<procedure name='Hematócrito' type='exame'>
 
 		<filter page='1' line='1' type='text' value='Clínica Prontovet' />
 		<filter page='1' line='1' type='text' value='Hematócrito' />
@@ -17,7 +17,7 @@
 		</result-block>
 
 
-	</parser>
+	</procedure>
 
 
 </pdfimport>

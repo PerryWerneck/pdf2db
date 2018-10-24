@@ -40,6 +40,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="`pkg-config --libs poppler-cpp`" />
+			<Add library="pugixml" />
 		</Linker>
 		<Unit filename="src/components/components/core/defs.h" />
 		<Unit filename="src/components/components/core/string.h" />
@@ -58,6 +59,8 @@
 		<Unit filename="src/include/config.h" />
 		<Unit filename="src/include/pdfimporter.h" />
 		<Unit filename="src/main/document.cc" />
+		<Unit filename="src/main/filters.cc" />
+		<Unit filename="src/main/parser.cc" />
 		<Unit filename="src/main/pdfimporter.cc" />
 		<Extensions>
 			<code_completion />

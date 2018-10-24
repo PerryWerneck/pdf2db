@@ -66,5 +66,28 @@
 
  }
 
+ const char * PDFImporter::Document::get(unsigned int page, unsigned int line) const {
+
+	if(!(page && line)) {
+		throw EINVAL;
+	}
+
+	page--;
+	line--;
+
+	if(page > pages.size()) {
+		return "";
+	}
+
+	const Page &pg = pages[page];
+
+	if(line > pg.size()) {
+		return "";
+	}
+
+	return pg[line].c_str();
+
+ }
+
 
 

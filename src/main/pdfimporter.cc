@@ -22,6 +22,10 @@ using namespace std;
 
 int main(int argc, const char *argv[]) {
 
+	// Carrega definições de procedimentos
+
+
+	// Carrega arquivos PDF.
 	PDFImporter::Document file("./sample.pdf");
 
 	file.forEach([](const char *line) {
