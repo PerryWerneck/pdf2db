@@ -16,6 +16,7 @@
 #include <iostream>
 #include <vector>
 #include <dirent.h>
+#include <cstring>
 
 using namespace std;
 
@@ -29,19 +30,11 @@ static const char *dburi = "mysql:user='ctpetUI';password='ctPET@27903';database
 
 /// @brief Verifica se o arquivo termina em .xml
 static int xmlFilter(const struct dirent *entry) {
-	return 1;
-//	return APPNAME::string::hasSuffix(entry->d_name,".xml") ? 1 : 0;
+	return hasSuffix(entry->d_name,".xml") ? 1 : 0;
 }
 
 int main(int argc, const char *argv[]) {
 
-	PDFImporter::Document("./sample.pdf").forEach([](const char *line) {
-		cout << line << endl;
-		return true;
-	});
-
-
-/*
 	/// @brief Lista de parsers definida
 	std::vector<PDFImporter::Parser> parsers;
 
@@ -101,10 +94,102 @@ int main(int argc, const char *argv[]) {
 		}
 
 	}
-*/
 
 	return 0;
 
 }
 
+
+/**
+ * @brief Removes trailing whitespace from a string.
+ *
+ * This function doesn't allocate or reallocate any memory;
+ * it modifies in place. Therefore, it cannot be used
+ * on statically allocated strings.
+ *
+ * Reference: <https://git.gnome.org/browse/glib/tree/glib/gstrfuncs.c>
+ *
+ * @see chug() and strip().
+ *
+ * @return pointer to string.
+ *
+ */
+char * chomp(char *str) noexcept {
+
+	size_t len = strlen(str);
+
+	while(len--) {
+
+		if(isspace(str[len])) {
+			str[len] = 0;
+		} else {
+			break;
+		}
+	}
+
+	return str;
+
+}
+
+/**
+ * @brief Remove the leading whitespace from the string.
+ *
+ * Removes leading whitespace from a string, by moving the rest
+ * of the characters forward.
+ *
+ * This function doesn't allocate or reallocate any memory;
+ * it modifies the string in place. Therefore, it cannot be used on
+ * statically allocated strings.
+ *
+ * Reference: <https://git.gnome.org/browse/glib/tree/glib/gstrfuncs.c>
+ *
+ * @see chomp() and strip().
+ *
+ * @return pointer to string.
+ *
+ */
+char * chug (char *str) noexcept {
+
+	char *start;
+
+	for (start = (char*) str; *start && isspace(*start); start++);
+
+	memmove(str, start, strlen ((char *) start) + 1);
+
+	return str;
+}
+
+char * strip(char *str) noexcept {
+	return chomp(chug(str));
+}
+
+string & strip(string &s) noexcept {
+	char *str = new char[s.size()+1];
+	memcpy(str,s.c_str(),s.size());
+	str[s.size()] = 0;
+	strip(str);
+	s.assign(str);
+	delete[] str;
+	return s;
+}
+
+/**
+ * @brief Looks whether the string ends with suffix.
+ *
+ * Reference: <https://git.gnome.org/browse/glib/tree/glib/gstrfuncs.c>
+ *
+ * Obs: The test is case insensitive.
+ *
+ */
+bool hasSuffix(const char *str, const char *suffix) noexcept {
+
+	int str_len     = strlen(str);
+	int suffix_len  = strlen(suffix);
+
+	if (str_len < suffix_len)
+		return false;
+
+	return strcasecmp ( (str + str_len) - suffix_len, suffix) == 0;
+
+}
 

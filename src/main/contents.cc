@@ -100,7 +100,7 @@
 
 		bool set(const Document &document) override {
 			RegexDelimitedBlock::set(document);
-//			text.strip();
+			strip(text);
 //			debug("%s=\n%s",getName().c_str(),text.c_str());
 			return !text.empty();
 		}
@@ -139,7 +139,8 @@
 
 				if(std::regex_search(document.getString(page,line), match, this->expression)) {
 					for(size_t ix = 1; ix < match.size();ix++) {
-//						onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
+						string s(match.str(1).c_str());
+						onExtractedResult(ix-1,strip(s).c_str());
 					}
 				}
 
@@ -153,7 +154,8 @@
 
 					if(std::regex_search(str, match, this->expression)) {
 						for(size_t ix = 1; ix < match.size();ix++) {
-//							onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
+							string s(match.str(1).c_str());
+							onExtractedResult(ix-1,strip(s).c_str());
 						}
 						return false;
 					}

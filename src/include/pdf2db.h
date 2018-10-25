@@ -24,6 +24,12 @@
 	using std::string;
 	using XMLNode = pugi::xml_node;
 
+	extern char * chomp(char *str) noexcept;
+	extern char * chug (char *str) noexcept;
+	extern char * strip(char *str) noexcept;
+	extern string & strip(string &str) noexcept;
+	extern bool hasSuffix(const char *str, const char *suffix) noexcept;
+
 	namespace PDFImporter {
 
 		/// @brief Documento PDF já convertido para texto sem espaços.

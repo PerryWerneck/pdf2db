@@ -58,11 +58,9 @@
 
 		split(doc->create_page(pg)->text(),pages.back());
 
-		/*
 		for(auto ln = pages.back().begin(); ln != pages.back().end(); ln++) {
-			ln->strip();
+			strip(*ln);
 		}
-		*/
 
 	}
 
