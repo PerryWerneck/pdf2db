@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Importação de exames em PDF para o banco de dados" />
+		<Option title="Extract data from PDF to SQL Database" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -44,27 +44,13 @@
 			<Add library="pugixml" />
 			<Add library="cppdb" />
 		</Linker>
-		<Unit filename="src/components/components/core/defs.h" />
-		<Unit filename="src/components/components/core/string.h" />
-		<Unit filename="src/components/core/log.cc" />
-		<Unit filename="src/components/core/storedstring.cc" />
-		<Unit filename="src/components/core/string/get.cc" />
-		<Unit filename="src/components/core/string/select.cc" />
-		<Unit filename="src/components/core/string/set.cc" />
-		<Unit filename="src/components/core/string/string.cc" />
-		<Unit filename="src/components/core/string/test.cc" />
-		<Unit filename="src/components/core/string/tostring.cc" />
-		<Unit filename="src/components/core/stringtable.cc" />
-		<Unit filename="src/components/core/tempfile.cc" />
-		<Unit filename="src/components/core/textfile.cc" />
-		<Unit filename="src/components/core/windows/registry.cc" />
 		<Unit filename="src/include/config.h" />
-		<Unit filename="src/include/pdfimporter.h" />
+		<Unit filename="src/include/pdfdb.h" />
 		<Unit filename="src/main/contents.cc" />
 		<Unit filename="src/main/document.cc" />
 		<Unit filename="src/main/filters.cc" />
 		<Unit filename="src/main/parser.cc" />
-		<Unit filename="src/main/pdfimporter.cc" />
+		<Unit filename="src/main/pdfdb.cc" />
 		<Unit filename="src/main/query.cc" />
 		<Extensions>
 			<code_completion />
