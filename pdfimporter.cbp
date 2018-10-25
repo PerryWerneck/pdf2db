@@ -42,6 +42,7 @@
 		<Linker>
 			<Add option="`pkg-config --libs poppler-cpp`" />
 			<Add library="pugixml" />
+			<Add library="cppdb" />
 		</Linker>
 		<Unit filename="src/components/components/core/defs.h" />
 		<Unit filename="src/components/components/core/string.h" />
@@ -64,6 +65,7 @@
 		<Unit filename="src/main/filters.cc" />
 		<Unit filename="src/main/parser.cc" />
 		<Unit filename="src/main/pdfimporter.cc" />
+		<Unit filename="src/main/query.cc" />
 		<Extensions>
 			<code_completion />
 			<envvars />

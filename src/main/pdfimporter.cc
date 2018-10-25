@@ -17,7 +17,6 @@
 #include <vector>
 #include <dirent.h>
 
-
 using namespace std;
 using namespace APPNAME;
 
@@ -26,6 +25,9 @@ using namespace APPNAME;
 /// @brief Diretório de onde serão lidas as definições de importação.
 static const char *defdir = "./import.d";
 
+/// @brief URL para acesso ao banco de dados
+static const char *dburi = "mysql:user='ctpetUI';password='ctPET@27903';database='ctpet';protocol='socket';unix_socket='/var/run/mysql/mysql.sock'";
+
 /// @brief Verifica se o arquivo termina em .xml
 static int xmlFilter(const struct dirent *entry) {
 	return APPNAME::string::hasSuffix(entry->d_name,".xml") ? 1 : 0;
@@ -33,8 +35,11 @@ static int xmlFilter(const struct dirent *entry) {
 
 int main(int argc, const char *argv[]) {
 
-	// Lista de parsers definida
+	/// @brief Lista de parsers definida
 	std::vector<PDFImporter::Parser> parsers;
+
+	/// @brief Conexão com o banco de dados.
+	cppdb::session sql(dburi);
 
 	// Carrega definições de procedimentos
 	struct dirent **namelist;
@@ -57,7 +62,7 @@ int main(int argc, const char *argv[]) {
 		for(XMLNode top : doc) {
 
 			for(XMLNode node = top.child("procedure"); node; node = node.next_sibling("procedure")) {
-				parsers.emplace_back(node);
+				parsers.emplace_back(sql,node);
 			}
 
 		}

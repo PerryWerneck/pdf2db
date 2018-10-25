@@ -20,6 +20,7 @@
 	#include <components/core/string.h>
 	#include <functional>
 	#include <pugixml.hpp>
+	#include <cppdb/frontend.h>
 
 	using APPNAME::string;
 	using std::vector;
@@ -106,6 +107,21 @@
 
 		};
 
+		/// @brief Comando SQL já preparado.
+		class Query {
+		private:
+			/// @brief Statement a enviar para o banco.
+			cppdb::statement st;
+
+			/// @brief Nome das propriedades para o SQL.
+			std::vector<string> names;
+
+		public:
+			Query(cppdb::session &sql, const XMLNode &node);
+			~Query();
+
+		};
+
 		/// @brief Parser de documento.
 		class Parser {
 		private:
@@ -116,15 +132,19 @@
 			/// @brief Lista de valores extraídos do documento..
 			std::vector<Content *> contents;
 
+			/// @brief Comandos SQL a executar.
+			std::vector<Query *> queryes;
+
 		public:
 
-			Parser(const XMLNode &node);
+			Parser(cppdb::session &sql, const XMLNode &node);
 			~Parser();
 
 			/// @brief Faz o parse do documento.
 			bool set(const Document &document);
 
 		};
+
 
 	}
 

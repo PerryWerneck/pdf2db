@@ -14,7 +14,7 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
- PDFImporter::Parser::Parser(const pugi::xml_node &node) {
+ PDFImporter::Parser::Parser(cppdb::session &sql, const pugi::xml_node &node) {
 
   	for(auto filter = node.child("filter"); filter; filter = filter.next_sibling("filter")) {
 		filters.push_back(Filter::create(filter));
@@ -23,6 +23,11 @@
   	for(auto property = node.child("property"); property; property = property.next_sibling("property")) {
 		contents.push_back(Content::create(property));
   	}
+
+  	for(auto query = node.child("sql"); query; query = query.next_sibling("sql")) {
+		queryes.push_back(new Query(sql,query));
+  	}
+
  }
 
  PDFImporter::Parser::~Parser() {
@@ -33,6 +38,10 @@
 
 	for(auto content : contents) {
 		delete content;
+	}
+
+	for(auto query : this->queryes) {
+		delete query;
 	}
 
  }
