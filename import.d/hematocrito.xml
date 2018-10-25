@@ -51,7 +51,7 @@
 				INTO `raca`
 					(`description`)
 				VALUES
-					("SEM RAÇA DEFINIDA")
+					(${raca})
 				ON DUPLICATE KEY UPDATE
 					idraca=LAST_INSERT_ID(idraca);
 		</sql>
