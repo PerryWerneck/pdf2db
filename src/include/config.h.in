@@ -1,0 +1,30 @@
+#ifndef CONFIG_H_INCLUDED
+
+	#define CONFIG_H_INCLUDED 1
+
+       /// @brief Nome do pacote.
+        #undef PACKAGE_NAME @PACKAGE_NAME@
+
+        /// @brief Versão atual.
+        #undef PACKAGE_VERSION @PACKAGE_VERSION@
+
+        /// @brief Descrição do aplicativo.
+        #undef PACKAGE_DESCRIPTION @PACKAGE_DESCRIPTION@
+
+	/// @brief Tenho ICONV?
+	#undef HAVE_ICONV 
+
+	/// @brief Indica se é possível usar traduções
+	#undef HAVE_LIBINTL
+
+	/// @brief Indica se o pugixml está disponível
+	#undef HAVE_PUGIXML
+
+	/// @brief Define to 1 if the system has getopt()
+	#undef HAVE_GETOPT
+
+	/// @brief Defined on most unixes
+	#undef HAVE_UNISTD_H
+
+#endif // CONFIG_H_INCLUDED
+
