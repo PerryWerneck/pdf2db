@@ -9,4 +9,5 @@ autom4te.cache
 *.status
 configure
 stamp-h1
-
+config.h
+*.pdf

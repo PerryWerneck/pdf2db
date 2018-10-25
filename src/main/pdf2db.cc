@@ -129,23 +129,32 @@ int main(int argc, char *argv[]) {
 
 	cout << "Carreguei " << parsers.size() << " formatos de documento." << endl;
 
-	// Carrega arquivos PDF.
-	PDFImporter::Document document("./sample.pdf");
+	if (optind < argc) {
+		do {
+
+			cout << "Parsing " << argv[optind] << "..." << endl;
+
+			PDFImporter::Document document(argv[optind]);
 
 #ifdef DEBUG
-	size_t ln = 1;
-	document.forEach([&ln](const char *line) {
-		cout << (ln++) << ":\t" << line << endl;
-		return true;
-	});
+			size_t ln = 1;
+			document.forEach([&ln](const char *line) {
+				cout << (ln++) << ":\t" << line << endl;
+				return true;
+			});
 #endif // DEBUG
 
-	for(auto parser = parsers.begin(); parser != parsers.end(); parser++) {
+			for(auto parser = parsers.begin(); parser != parsers.end(); parser++) {
 
-		if(parser->set(sql, document)) {
-			cout << "Encontrei documento válido" << endl;
-			break;
+				if(parser->set(sql, document)) {
+					cout << "Encontrei documento válido" << endl;
+					break;
+				}
+
+			}
+
 		}
+		while ( ++optind < argc);
 
 	}
 
