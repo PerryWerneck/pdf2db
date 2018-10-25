@@ -11,14 +11,78 @@
 		<filter page='1' line='1' type='text' value='^Clínica Prontovet' />
 		<filter page='1' line='4' type='text' value='^Hematócrito' />
 
-		<property name='idanimal' type='regex' page='1' expression='^Animal:(.*)-.*'>
-		</property>
-
+		<!-- Informações do tutor -->
 		<property name='idtutor' type='regex' page='1' line='9' expression='(.*)-.*'>
 		</property>
 
-		<!--property name='nomeanimal' type='regex' page='1' expression='^Animal:.*-(.*)Peso.*'>
-		</property-->
+		<property name='nametutor' type='regex' page='1' line='9' expression='.*-(.*)'>
+		</property>
+
+		<sql>
+			INSERT
+				INTO `tutor`
+					(`identificacao`,`name`)
+				VALUES
+					(${idtutor}, "${nametutor}")
+				ON DUPLICATE KEY UPDATE
+					idtutor=LAST_INSERT_ID(idtutor);
+		</sql>
+
+		<!-- Informações para atualização de tabelas -->
+
+		<property name='especie' type='regex' page='1' expression='^Espécie:(.*)Sexo.*'>
+		</property>
+
+		<sql>
+			INSERT
+				INTO `especie`
+					(`name`)
+				VALUES
+					("FELINA")
+				ON DUPLICATE KEY UPDATE
+					idespecie=LAST_INSERT_ID(${especie});
+		</sql>
+
+		<property name='raca' type='regex' page='1' expression='^Raça:(.*)Idade.*'>
+		</property>
+
+		<sql>
+			INSERT
+				INTO `raca`
+					(`description`)
+				VALUES
+					("SEM RAÇA DEFINIDA")
+				ON DUPLICATE KEY UPDATE
+					idraca=LAST_INSERT_ID(idraca);
+		</sql>
+
+		<!-- Informações do animal -->
+		<property name='idanimal' type='regex' page='1' expression='^Animal:(.*)-.*'>
+		</property>
+
+		<property name='genero' type='regex' page='1' expression='.*Sexo:(.*)$'>
+		</property>
+
+		<property name='nomeanimal' type='regex' page='1' expression='^Animal:.*-(.*)Peso.*'>
+		</property>
+
+		<sql>
+			INSERT
+				INTO `animal`
+					(`idtutor`, `idespecie`, `idraca`, `identificacao`, `name`, `genero`)
+				VALUES (
+					(select idtutor from tutor where tutor.identificacao='${idtutor}'),
+					(select idespecie from especie where especie.name='${especie}'),
+					(select idraca from raca where raca.description='${raca}'),
+					${idanimal},
+					lower('${nomeanimal}'),
+					lower('${genero}')
+				)
+				ON DUPLICATE KEY UPDATE
+					idanimal=LAST_INSERT_ID(idanimal);
+		</sql>
+
+		<!-- Dados do exame -->
 
 		<property name='resultado' type='text-block' page='1' begin='^Resultado$' end='^Horário.*'>
 		</property>
@@ -31,6 +95,8 @@
 
 		<property name='horaexame' type='regex' page='1' expression='^Horário.*([0-9][0-9]:[0-9][0-9])'>
 		</property>
+
+		<!-- Resultados do exame -->
 
 	</procedure>
 
