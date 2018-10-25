@@ -10,7 +10,7 @@
  *
  */
 
- #include <pdfimporter.h>
+ #include <pdf2db.h>
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
@@ -18,7 +18,7 @@
 
  	string str = node.child_value();
 
- 	str.strip();
+// 	str.strip();
 
  	size_t from;
  	while( (from = str.find_first_of("${")) != string::npos ) {
@@ -30,13 +30,13 @@
 		size_t szBlock = (to - from);
 		names.emplace_back(str.c_str()+from+2,(szBlock)-2);
 
-		debug("key=\"%s\"",names.back().c_str());
+//		debug("key=\"%s\"",names.back().c_str());
 		str.replace(from,szBlock+1,"?");
 
 
  	}
 
- 	debug("SQL:\n%s\n",str.c_str());
+// 	debug("SQL:\n%s\n",str.c_str());
  	st= sql.prepare(str.c_str());
 
  }

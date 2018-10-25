@@ -12,13 +12,12 @@
  *
  */
 
-#include <pdfimporter.h>
+#include <pdf2db.h>
 #include <iostream>
 #include <vector>
 #include <dirent.h>
 
 using namespace std;
-using namespace APPNAME;
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
@@ -30,11 +29,19 @@ static const char *dburi = "mysql:user='ctpetUI';password='ctPET@27903';database
 
 /// @brief Verifica se o arquivo termina em .xml
 static int xmlFilter(const struct dirent *entry) {
-	return APPNAME::string::hasSuffix(entry->d_name,".xml") ? 1 : 0;
+	return 1;
+//	return APPNAME::string::hasSuffix(entry->d_name,".xml") ? 1 : 0;
 }
 
 int main(int argc, const char *argv[]) {
 
+	PDFImporter::Document("./sample.pdf").forEach([](const char *line) {
+		cout << line << endl;
+		return true;
+	});
+
+
+/*
 	/// @brief Lista de parsers definida
 	std::vector<PDFImporter::Parser> parsers;
 
@@ -50,8 +57,9 @@ int main(int argc, const char *argv[]) {
 
 	for(int file = 0; file < qtdFiles; file++) {
 
-		APPNAME::string filename;
-		filename.concat(defdir,"/",namelist[file]->d_name,nullptr);
+		string filename = defdir;
+		filename += "/";
+		filename += namelist[file]->d_name;
 		free(namelist[file]);
 
 		clog << "Lendo definições de " << filename << "..." << endl;
@@ -93,7 +101,7 @@ int main(int argc, const char *argv[]) {
 		}
 
 	}
-
+*/
 
 	return 0;
 

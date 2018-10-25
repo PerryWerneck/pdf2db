@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output=".bin/Debug/pdfimporter" prefix_auto="1" extension_auto="1" />
+				<Option output=".bin/Debug/pdf2db" prefix_auto="1" extension_auto="1" />
 				<Option object_output=".obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -18,7 +18,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output=".bin/Release/pdfimporter" prefix_auto="1" extension_auto="1" />
+				<Option output=".bin/Release/pdf2db" prefix_auto="1" extension_auto="1" />
 				<Option object_output=".obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -35,7 +35,6 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add option="`pkg-config --cflags poppler-cpp`" />
-			<Add option="-DAPPNAME=PwPET" />
 			<Add directory="src/components" />
 			<Add directory="src/include" />
 		</Compiler>
@@ -45,12 +44,12 @@
 			<Add library="cppdb" />
 		</Linker>
 		<Unit filename="src/include/config.h" />
-		<Unit filename="src/include/pdfdb.h" />
+		<Unit filename="src/include/pdf2db.h" />
 		<Unit filename="src/main/contents.cc" />
 		<Unit filename="src/main/document.cc" />
 		<Unit filename="src/main/filters.cc" />
 		<Unit filename="src/main/parser.cc" />
-		<Unit filename="src/main/pdfdb.cc" />
+		<Unit filename="src/main/pdf2db.cc" />
 		<Unit filename="src/main/query.cc" />
 		<Extensions>
 			<code_completion />

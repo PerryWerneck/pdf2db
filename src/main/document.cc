@@ -1,5 +1,5 @@
 /**
- * @file pdfimporter/src/main/document.cc
+ * @file src/main/document.cc
  *
  * @brief
  *
@@ -10,21 +10,41 @@
  *
  */
 
- #include <pdfimporter.h>
+ #include <cstring>
+ #include <pdf2db.h>
  #include <poppler-document.h>
  #include "poppler-page.h"
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
- static PwPET::string toString(poppler::ustring str){
+ static void split(poppler::ustring s, vector<string> &lines){
 
-	if(!str.length()) {
-		return PwPET::string();
+	if(!s.length()) {
+		return;
 	}
 
-    auto buf = str.to_utf8();
+    auto buf = s.to_utf8();
+    auto str = buf.data();
+    size_t from = 0;
 
-	return PwPET::string(buf.data(), buf.size());
+	while(from < buf.size()) {
+
+		auto ptr = strchr(str+from,'\n');
+		if(!ptr) {
+			break;
+		}
+
+		size_t sz = (ptr - str) - from;
+		lines.emplace_back((str+from),sz);
+		from += (sz+1);
+
+	}
+
+	if(from < buf.size()) {
+		lines.emplace_back(str+from);
+	}
+
+//	return string(buf.data(), buf.size());
 
  }
 
@@ -36,11 +56,13 @@
 
 		pages.emplace_back();
 
-		toString(doc->create_page(pg)->text()).split(pages.back(),'\n');
+		split(doc->create_page(pg)->text(),pages.back());
 
+		/*
 		for(auto ln = pages.back().begin(); ln != pages.back().end(); ln++) {
 			ln->strip();
 		}
+		*/
 
 	}
 

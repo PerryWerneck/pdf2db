@@ -10,7 +10,7 @@
  *
  */
 
- #include <pdfimporter.h>
+ #include <pdf2db.h>
  #include <regex>
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
@@ -53,15 +53,15 @@
 
 					if(regex_match(line,to)) {
 						loading = false;
-						debug("%s: Achei final (%s)",getName().c_str(),string(line).strip().c_str());
+//						debug("%s: Achei final (%s)",getName().c_str(),string(line).strip().c_str());
 						return false;
 					}
 
-					debug("[%s]",line);
+//					debug("[%s]",line);
 					onTextLine(line);
 
 				} else if(regex_match(line,from)) {
-					debug("%s: Achei inicio (%s)",getName().c_str(),string(line).strip().c_str());
+//					debug("%s: Achei inicio (%s)",getName().c_str(),string(line).strip().c_str());
 					loading = true;
 				}
 
@@ -100,8 +100,8 @@
 
 		bool set(const Document &document) override {
 			RegexDelimitedBlock::set(document);
-			text.strip();
-			debug("%s=\n%s",getName().c_str(),text.c_str());
+//			text.strip();
+//			debug("%s=\n%s",getName().c_str(),text.c_str());
 			return !text.empty();
 		}
 	};
@@ -114,7 +114,7 @@
 
 		/// @brief Método chamado quando encontra as linhas a filtrar.
 		virtual void onExtractedResult(size_t index, const char *result) {
-			debug("%s(%u)=\"%s\"",getName().c_str(),(unsigned int) index, result);
+//			debug("%s(%u)=\"%s\"",getName().c_str(),(unsigned int) index, result);
 		}
 
 
@@ -139,7 +139,7 @@
 
 				if(std::regex_search(document.getString(page,line), match, this->expression)) {
 					for(size_t ix = 1; ix < match.size();ix++) {
-						onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
+//						onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
 					}
 				}
 
@@ -153,7 +153,7 @@
 
 					if(std::regex_search(str, match, this->expression)) {
 						for(size_t ix = 1; ix < match.size();ix++) {
-							onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
+//							onExtractedResult(ix-1,string(match.str(1).c_str()).strip().c_str());
 						}
 						return false;
 					}
@@ -168,6 +168,7 @@
 		}
 	};
 
+	/*
  	switch(string(node.attribute("type").as_string("text-block")).select("text-block","regex",nullptr)) {
 	case 0:
 		return new TextBlockContent(node);
@@ -176,6 +177,7 @@
 		return new RegexExtractedValue(node);
 
  	}
+ 	*/
 
  	throw EINVAL;
 

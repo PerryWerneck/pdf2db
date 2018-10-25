@@ -1,5 +1,5 @@
 /**
- * @file pdfimporter/src/main/parser.cc
+ * @file src/main/parser.cc
  *
  * @brief
  *
@@ -10,7 +10,7 @@
  *
  */
 
- #include <pdfimporter.h>
+ #include <pdf2db.h>
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 

@@ -1,5 +1,5 @@
 /**
- * @file pdfimporter/src/main/filters.cc
+ * @file src/main/filters.cc
  *
  * @brief Implementa filtros de conteúdo.
  *
@@ -10,7 +10,7 @@
  *
  */
 
- #include <pdfimporter.h>
+ #include <pdf2db.h>
  #include <regex>
 
  using namespace std;
@@ -47,13 +47,15 @@
  	};
 
 
- 	switch(APPNAME::string(node.attribute("type").as_string("text")).select("text","regex",nullptr)) {
+ 	/*
+ 	switch(string(node.attribute("type").as_string("text")).select("text","regex",nullptr)) {
 	case 0:
 		return new LineFilter(node);
 
 	case 1:
 		break;
  	}
+ 	*/
 
  	throw EINVAL;
 

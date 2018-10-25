@@ -1,5 +1,5 @@
 /**
- * @file pdfimporter/src/include/pdfimporter.h
+ * @file src/include/pdfimporter.h
  *
  * @brief Definições para o importador de PDF C++
  *
@@ -15,15 +15,13 @@
 	#define PDFIMPORPER_H_INCLUDED 1
 
 	#include <config.h>
-	#include <components/core/defs.h>
-	#include <components/core/log.h>
-	#include <components/core/string.h>
+	#include <string>
 	#include <functional>
 	#include <pugixml.hpp>
 	#include <cppdb/frontend.h>
 
-	using APPNAME::string;
 	using std::vector;
+	using std::string;
 	using XMLNode = pugi::xml_node;
 
 	namespace PDFImporter {
