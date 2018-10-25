@@ -17,13 +17,14 @@
 #include <vector>
 #include <dirent.h>
 #include <cstring>
+#include <getopt.h>
 
 using namespace std;
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
 /// @brief Diretório de onde serão lidas as definições de importação.
-static const char *defdir = "./import.d";
+static const char *xmlDir = "./import.d";
 
 /// @brief URL para acesso ao banco de dados
 static const char *dburi = "mysql:user='ctpetUI';password='ctPET@27903';database='ctpet';protocol='socket';unix_socket='/var/run/mysql/mysql.sock'";
@@ -33,7 +34,60 @@ static int xmlFilter(const struct dirent *entry) {
 	return hasSuffix(entry->d_name,".xml") ? 1 : 0;
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, char *argv[]) {
+
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+	#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+	static struct option options[] = {
+		{ "dburi",		required_argument,	0,	'D' },
+		{ "xmlpath",	required_argument,	0,	'X' },
+
+		{ "help",		no_argument,		0,	'h' },
+		{ 0, 0, 0, 0}
+
+	};
+	#pragma GCC diagnostic pop
+
+	static const char * helptext[] = {
+
+		"Database connection string (see CPPDB documentation for more info)",
+		"Path for loading the XML definitions"
+	};
+
+	int long_index =0;
+	int opt;
+	while((opt = getopt_long(argc, argv, "D:X:h", options, &long_index )) != -1) {
+
+		switch(opt) {
+		case 'D':	// DBURI
+			dburi = optarg;
+			break;
+
+		case 'X':	// xmlpath
+			xmlDir = optarg;
+			break;
+
+		case 'C':	// Core
+			break;
+
+		case 'h':	// Help
+
+			cout 	<< "Uso:" << endl << "  " PACKAGE_NAME " [OPCAO...] - " PACKAGE_DESCRIPTION << endl << endl
+					<< "Opcoes de aplicativo:" << endl;
+
+			for(size_t f = 0; f < (sizeof(helptext)/sizeof(helptext[0])); f++) {
+				string str(options[f].name);
+				str.resize(15,' ');
+				cout << "  -" << ((char) options[f].val) << ", --" << str << " " << helptext[f] << endl;
+			}
+			cout << endl;
+			exit(0);
+
+		}
+
+	}
+
 
 	/// @brief Lista de parsers definida
 	std::vector<PDFImporter::Parser> parsers;
@@ -43,14 +97,14 @@ int main(int argc, const char *argv[]) {
 
 	// Carrega definições de procedimentos
 	struct dirent **namelist;
-	int qtdFiles = scandir(defdir, &namelist, xmlFilter, alphasort);
+	int qtdFiles = scandir(xmlDir, &namelist, xmlFilter, alphasort);
 	if(qtdFiles < 0) {
 		throw errno;
 	}
 
 	for(int file = 0; file < qtdFiles; file++) {
 
-		string filename = defdir;
+		string filename = xmlDir;
 		filename += "/";
 		filename += namelist[file]->d_name;
 		free(namelist[file]);
