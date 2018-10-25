@@ -47,6 +47,12 @@
  	};
 
 
+	auto type = node.attribute("type").as_string("text");
+
+	if(!strcasecmp(type,"text")) {
+		return new LineFilter(node);
+	}
+
  	/*
  	switch(string(node.attribute("type").as_string("text")).select("text","regex",nullptr)) {
 	case 0:

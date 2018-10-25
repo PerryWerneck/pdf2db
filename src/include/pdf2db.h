@@ -19,6 +19,17 @@
 	#include <functional>
 	#include <pugixml.hpp>
 	#include <cppdb/frontend.h>
+	#include <cstdio>
+	#include <iostream>
+
+	#ifdef DEBUG
+		#define trace( fmt, ... )	fprintf(stderr,"%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ );fflush(stderr)
+		#define debug( fmt, ... )	fprintf(stderr,"%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ );fflush(stderr)
+	#else
+		#define trace( fmt, ... )	/* */
+		#define debug( fmt, ... )	/* */
+	#endif // DEBUG
+
 
 	using std::vector;
 	using std::string;
@@ -31,6 +42,8 @@
 	extern bool hasSuffix(const char *str, const char *suffix) noexcept;
 
 	namespace PDFImporter {
+
+		class Parser;
 
 		/// @brief Documento PDF já convertido para texto sem espaços.
 		class Document {
@@ -109,11 +122,18 @@
 				return this->name;
 			}
 
+			virtual const char * c_str() const = 0;
+
 		};
 
 		/// @brief Comando SQL já preparado.
 		class Query {
 		private:
+
+#ifdef DEBUG
+			string text;
+#endif // DEBUG
+
 			/// @brief Statement a enviar para o banco.
 			cppdb::statement st;
 
@@ -124,6 +144,9 @@
 			Query(cppdb::session &sql, const XMLNode &node);
 			~Query();
 
+			/// @brief Armazena valores processados no banco.
+			void store(cppdb::session &sql, const Parser &parser);
+
 		};
 
 		/// @brief Parser de documento.
@@ -133,7 +156,7 @@
 			/// @brief Lista de filtros a aplicar no documento.
 			std::vector<Filter *> filters;
 
-			/// @brief Lista de valores extraídos do documento..
+			/// @brief Lista de valores extraídos do documento.
 			std::vector<Content *> contents;
 
 			/// @brief Comandos SQL a executar.
@@ -145,7 +168,9 @@
 			~Parser();
 
 			/// @brief Faz o parse do documento.
-			bool set(const Document &document);
+			bool set(cppdb::session &sql, const Document &document);
+
+			const char * operator [](const char *name) const;
 
 		};
 

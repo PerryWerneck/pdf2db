@@ -88,7 +88,7 @@ int main(int argc, const char *argv[]) {
 
 	for(auto parser = parsers.begin(); parser != parsers.end(); parser++) {
 
-		if(parser->set(document)) {
+		if(parser->set(sql, document)) {
 			cout << "Encontrei documento válido" << endl;
 			break;
 		}

@@ -11,6 +11,7 @@
  */
 
  #include <pdf2db.h>
+ #include <cstring>
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
@@ -47,7 +48,7 @@
  }
 
  /// @brief Faz o parse do documento.
- bool PDFImporter::Parser::set(const Document &document) {
+ bool PDFImporter::Parser::set(cppdb::session &sql, const Document &document) {
 
 	// Verifica se o documento atende aos filtros.
  	for(auto filter : filters) {
@@ -58,14 +59,53 @@
 
  	}
 
- 	// Atendeu aos filtros, extrai conteúdo.
-	for(auto content : contents) {
-		content->reset();
-		content->set(document);
-	}
+ 	// Atendeu aos filtros.
+ 	try {
+
+		// Extrai conteúdo.
+		for(auto content : contents) {
+			content->reset();
+			content->set(document);
+		}
+
+		// E atualiza o banco de dados.
+		cppdb::transaction guard(sql);
+
+		debug("*** %s",__FUNCTION__);
+		for(auto query : queryes) {
+			query->store(sql, *this);
+		}
+
+		guard.commit();
+
+ 	} catch(const std::exception &e) {
+
+		std::cerr << e.what() << std::endl;
+		return false;
+
+ 	} catch(...) {
+
+		std::cerr << "Unexpected error" << std::endl;
+		return false;
+
+ 	}
 
 
  	return true;
+ }
+
+ const char * PDFImporter::Parser::operator [](const char *name) const {
+
+ 				/// @brief Lista de valores extraídos do documento.
+	for(auto content : contents) {
+
+		if(!strcasecmp(content->getName().c_str(),name)) {
+			return content->c_str();
+		}
+
+	}
+
+ 	return "";
  }
 
 

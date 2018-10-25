@@ -53,15 +53,15 @@
 
 					if(regex_match(line,to)) {
 						loading = false;
-//						debug("%s: Achei final (%s)",getName().c_str(),string(line).strip().c_str());
+						debug("%s: Achei final (%s)",getName().c_str(),line);
 						return false;
 					}
 
-//					debug("[%s]",line);
+					debug("[%s]",line);
 					onTextLine(line);
 
 				} else if(regex_match(line,from)) {
-//					debug("%s: Achei inicio (%s)",getName().c_str(),string(line).strip().c_str());
+					debug("%s: Achei inicio (%s)",getName().c_str(),line);
 					loading = true;
 				}
 
@@ -101,9 +101,14 @@
 		bool set(const Document &document) override {
 			RegexDelimitedBlock::set(document);
 			strip(text);
-//			debug("%s=\n%s",getName().c_str(),text.c_str());
+			debug("%s=\n%s",getName().c_str(),text.c_str());
 			return !text.empty();
 		}
+
+		const char * c_str() const override {
+			return text.c_str();
+		}
+
 	};
 
 	/// @brief Elemento para extrair um valor
@@ -111,10 +116,12 @@
 	private:
 		std::regex expression;
 		unsigned int line;
+		string text;
 
 		/// @brief Método chamado quando encontra as linhas a filtrar.
 		virtual void onExtractedResult(size_t index, const char *result) {
-//			debug("%s(%u)=\"%s\"",getName().c_str(),(unsigned int) index, result);
+			debug("%s(%u)=\"%s\"",getName().c_str(),(unsigned int) index, result);
+			text = result;
 		}
 
 
@@ -131,6 +138,8 @@
 		}
 
 		bool set(const Document &document) override {
+
+			text.clear();
 
 			if(line) {
 
@@ -168,7 +177,22 @@
 
 			return true;
 		}
+
+		const char * c_str() const override {
+			return text.c_str();
+		}
+
 	};
+
+	auto type = node.attribute("type").as_string("regex");
+
+	if(!strcasecmp(type,"regex")) {
+		return new RegexExtractedValue(node);
+	}
+
+	if(!strcasecmp(type,"text-block")) {
+		return new TextBlockContent(node);
+	}
 
 	/*
  	switch(string(node.attribute("type").as_string("text-block")).select("text-block","regex",nullptr)) {

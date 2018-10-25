@@ -23,7 +23,7 @@
 				INTO `tutor`
 					(`identificacao`,`name`)
 				VALUES
-					(${idtutor}, "${nametutor}")
+					(${idtutor}, ${nametutor})
 				ON DUPLICATE KEY UPDATE
 					idtutor=LAST_INSERT_ID(idtutor);
 		</sql>
@@ -38,9 +38,9 @@
 				INTO `especie`
 					(`name`)
 				VALUES
-					("FELINA")
+					(lower(${especie}))
 				ON DUPLICATE KEY UPDATE
-					idespecie=LAST_INSERT_ID(${especie});
+					idespecie=LAST_INSERT_ID(idespecie);
 		</sql>
 
 		<property name='raca' type='regex' page='1' expression='^Raça:(.*)Idade.*'>
@@ -51,7 +51,7 @@
 				INTO `raca`
 					(`description`)
 				VALUES
-					(${raca})
+					(lower(${raca}))
 				ON DUPLICATE KEY UPDATE
 					idraca=LAST_INSERT_ID(idraca);
 		</sql>
@@ -71,12 +71,12 @@
 				INTO `animal`
 					(`idtutor`, `idespecie`, `idraca`, `identificacao`, `name`, `genero`)
 				VALUES (
-					(select idtutor from tutor where tutor.identificacao='${idtutor}'),
-					(select idespecie from especie where especie.name='${especie}'),
-					(select idraca from raca where raca.description='${raca}'),
+					(select idtutor from tutor where tutor.identificacao=${idtutor} limit 1),
+					(select idespecie from especie where especie.name=${especie} limit 1),
+					(select idraca from raca where raca.description=${raca} limit 1),
 					${idanimal},
-					lower('${nomeanimal}'),
-					lower('${genero}')
+					lower(${nomeanimal}),
+					lower(${genero})
 				)
 				ON DUPLICATE KEY UPDATE
 					idanimal=LAST_INSERT_ID(idanimal);
