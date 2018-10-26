@@ -190,23 +190,6 @@
 
 		}
 
-		/*
-		/// @brief Parser de documento.
-		class Parser {
-		private:
-
-
-
-		public:
-
-			Parser();
-			~Parser();
-
-
-
-		};
-		*/
-
 
 	}
 
