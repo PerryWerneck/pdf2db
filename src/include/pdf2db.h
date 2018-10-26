@@ -1,5 +1,5 @@
 /**
- * @file src/include/pdfimporter.h
+ * @file src/include/pdf2db.h
  *
  * @brief Definições para o importador de PDF C++
  *
@@ -42,8 +42,6 @@
 	extern bool hasSuffix(const char *str, const char *suffix) noexcept;
 
 	namespace PDFImporter {
-
-		class Parser;
 
 		/// @brief Documento PDF já convertido para texto sem espaços.
 		class Document {
@@ -149,30 +147,65 @@
 
 		};
 
+		/// &brief Parsers diversos.
+		namespace Parser {
+
+		    /// @brief Base para parsers.
+		    class Abstract {
+            private:
+
+                /// @brief "Pai" desse parser.
+                const Abstract *parent;
+
+                /// @brief Lista de valores extraídos do documento.
+                std::vector<Content *> contents;
+
+                /// @brief Comandos SQL a executar.
+                std::vector<Query *> queryes;
+
+            protected:
+                Abstract(cppdb::session &sql, const XMLNode &node, const Abstract *parent = nullptr);
+                virtual ~Abstract();
+
+                const char * operator [](const char *name) const;
+
+		    };
+
+		    /// @brief Parser para documento.
+		    class Document : public Abstract {
+            private:
+
+                /// @brief Lista de filtros para verificar se é um documento válido.
+                std::vector<Filter *> filters;
+
+            public:
+                Document(cppdb::session &sql, const XMLNode &node);
+                virtual ~Document();
+
+                /// @brief Faz o parse do documento.
+                bool set(cppdb::session &sql, const Document &document);
+
+		    };
+
+
+		}
+
+		/*
 		/// @brief Parser de documento.
 		class Parser {
 		private:
 
-			/// @brief Lista de filtros a aplicar no documento.
-			std::vector<Filter *> filters;
 
-			/// @brief Lista de valores extraídos do documento.
-			std::vector<Content *> contents;
-
-			/// @brief Comandos SQL a executar.
-			std::vector<Query *> queryes;
 
 		public:
 
-			Parser(cppdb::session &sql, const XMLNode &node);
+			Parser();
 			~Parser();
 
-			/// @brief Faz o parse do documento.
-			bool set(cppdb::session &sql, const Document &document);
 
-			const char * operator [](const char *name) const;
 
 		};
+		*/
 
 
 	}
