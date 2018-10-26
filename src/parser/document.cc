@@ -44,40 +44,8 @@
  	}
 
  	// Atendeu aos filtros.
+	return Parser::Abstract::set(sql,document);
 
- 	try {
-
-		// Extrai conteúdo.
-		for(auto property : properties) {
-
-			std::vector<string> text;
-
-			document.get(property->getPage(),property->getLine(),text);
-
-			property->clear();
-			property->set(text);
-
-		}
-
-		// Atualiza banco de dados.
-		cppdb::transaction guard(sql);
-		store(sql);
-		guard.commit();
-
- 	} catch(const std::exception &e) {
-
-		std::cerr << e.what() << std::endl;
-		return false;
-
- 	} catch(...) {
-
-		std::cerr << "Unexpected error" << std::endl;
-		return false;
-
- 	}
-
-
- 	return true;
  }
 
 

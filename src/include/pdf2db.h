@@ -179,6 +179,9 @@
 			public:
                 const char * operator [](const char *name) const;
 
+                /// @brief Faz o parse do documento.
+                virtual bool set(cppdb::session &sql, const PDFImporter::Document &document);
+
 		    };
 
 		    /// @brief Parser para documento.
@@ -193,7 +196,7 @@
                 virtual ~Document();
 
                 /// @brief Faz o parse do documento.
-                bool set(cppdb::session &sql, const PDFImporter::Document &document);
+                bool set(cppdb::session &sql, const PDFImporter::Document &document) override;
 
 		    };
 
