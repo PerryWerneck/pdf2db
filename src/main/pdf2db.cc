@@ -13,7 +13,6 @@
  */
 
 #include <pdf2db.h>
-#include <iostream>
 #include <vector>
 #include <dirent.h>
 #include <cstring>
@@ -29,6 +28,14 @@ static const char *xmlDir = "./import.d";
 /// @brief URL para acesso ao banco de dados
 static const char *dburi = "mysql:user='ctpetUI';password='ctPET@27903';database='ctpet';protocol='socket';unix_socket='/var/run/mysql/mysql.sock'";
 
+/// @brief Verbose?
+bool PDFImporter::verbose =
+#ifdef DEBUG
+	true;
+#else
+	false;
+#endif // DEBUG
+
 /// @brief Verifica se o arquivo termina em .xml
 static int xmlFilter(const struct dirent *entry) {
 	return hasSuffix(entry->d_name,".xml") ? 1 : 0;
@@ -42,6 +49,7 @@ int main(int argc, char *argv[]) {
 	static struct option options[] = {
 		{ "dburi",		required_argument,	0,	'D' },
 		{ "xmlpath",	required_argument,	0,	'X' },
+		{ "verbose",	no_argument,		0,	'v' },
 
 		{ "help",		no_argument,		0,	'h' },
 		{ 0, 0, 0, 0}
@@ -52,7 +60,8 @@ int main(int argc, char *argv[]) {
 	static const char * helptext[] = {
 
 		"Database connection string (see CPPDB documentation for more info)",
-		"Path for loading the XML definitions"
+		"Path for loading the XML definitions",
+		"Verbose mode"
 	};
 
 	int long_index =0;
@@ -69,6 +78,10 @@ int main(int argc, char *argv[]) {
 			break;
 
 		case 'C':	// Core
+			break;
+
+		case 'v':	// Verbose
+			PDFImporter::verbose = true;
 			break;
 
 		case 'h':	// Help
@@ -89,8 +102,8 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	/// @brief Lista de parsers definida
-	std::vector<PDFImporter::Parser> parsers;
+	/// @brief Lista de parsers de documento
+	std::vector<PDFImporter::Parser::Document> parsers;
 
 	/// @brief Conexão com o banco de dados.
 	cppdb::session sql(dburi);
@@ -109,14 +122,16 @@ int main(int argc, char *argv[]) {
 		filename += namelist[file]->d_name;
 		free(namelist[file]);
 
-		clog << "Lendo definições de " << filename << "..." << endl;
+		if(PDFImporter::verbose) {
+			clog << "Loading " << filename << endl;
+		}
 
 		pugi::xml_document doc;
 		doc.load_file(filename.c_str());
 
 		for(XMLNode top : doc) {
 
-			for(XMLNode node = top.child("procedure"); node; node = node.next_sibling("procedure")) {
+			for(XMLNode node = top.child("document-parser"); node; node = node.next_sibling("document-parser")) {
 				parsers.emplace_back(sql,node);
 			}
 
@@ -136,18 +151,17 @@ int main(int argc, char *argv[]) {
 
 			PDFImporter::Document document(argv[optind]);
 
-#ifdef DEBUG
-			size_t ln = 1;
-			document.forEach([&ln](const char *line) {
-				cout << (ln++) << ":\t" << line << endl;
-				return true;
-			});
-#endif // DEBUG
+			if(PDFImporter::verbose) {
+				size_t ln = 1;
+				document.forEach([&ln](const char *line) {
+					cout << "\t" << (ln++) << ":\t" << line << endl;
+					return true;
+				});
+			}
 
 			for(auto parser = parsers.begin(); parser != parsers.end(); parser++) {
 
 				if(parser->set(sql, document)) {
-					cout << "Encontrei documento válido" << endl;
 					break;
 				}
 

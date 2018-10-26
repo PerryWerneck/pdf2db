@@ -109,5 +109,37 @@
 
  }
 
+ void PDFImporter::Document::get(const unsigned int page, const unsigned int line, std::vector<string> &text) const {
+
+	if(page) {
+
+		pages.at(page-1).get(line,text);
+
+	} else {
+
+		for(auto pg = pages.begin(); pg != pages.end(); pg++) {
+            pg->get(line,text);
+		}
+
+	}
+
+ }
+
+ void PDFImporter::Document::Page::get(const unsigned int line, std::vector<string> &text) const {
+
+	if(line) {
+
+		text.push_back(this->at(line-1));
+
+	} else {
+
+		for(auto ln = this->begin(); ln != this->end(); ln++) {
+			text.push_back(ln->c_str());
+		}
+
+	}
+
+ }
+
 
 

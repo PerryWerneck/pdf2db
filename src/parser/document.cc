@@ -15,40 +15,24 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
- PDFImporter::Parser::Parser(cppdb::session &sql, const pugi::xml_node &node) {
+ PDFImporter::Parser::Document::Document(cppdb::session &sql, const pugi::xml_node &node) : PDFImporter::Parser::Abstract(sql,node) {
 
   	for(auto filter = node.child("filter"); filter; filter = filter.next_sibling("filter")) {
 		filters.push_back(Filter::create(filter));
   	}
 
-  	for(auto property = node.child("property"); property; property = property.next_sibling("property")) {
-		contents.push_back(Content::create(property));
-  	}
-
-  	for(auto query = node.child("sql"); query; query = query.next_sibling("sql")) {
-		queryes.push_back(new Query(sql,query));
-  	}
-
  }
 
- PDFImporter::Parser::~Parser() {
+ PDFImporter::Parser::Document::~Document() {
 
 	for(auto filter : filters) {
 		delete filter;
 	}
 
-	for(auto content : contents) {
-		delete content;
-	}
-
-	for(auto query : this->queryes) {
-		delete query;
-	}
-
  }
 
  /// @brief Faz o parse do documento.
- bool PDFImporter::Parser::set(cppdb::session &sql, const Document &document) {
+ bool PDFImporter::Parser::Document::set(cppdb::session &sql, const PDFImporter::Document &document) {
 
 	// Verifica se o documento atende aos filtros.
  	for(auto filter : filters) {
@@ -60,22 +44,24 @@
  	}
 
  	// Atendeu aos filtros.
+
  	try {
 
 		// Extrai conteúdo.
-		for(auto content : contents) {
-			content->reset();
-			content->set(document);
+		for(auto property : properties) {
+
+			std::vector<string> text;
+
+			document.get(property->getPage(),property->getLine(),text);
+
+			property->clear();
+			property->set(text);
+
 		}
 
-		// E atualiza o banco de dados.
+		// Atualiza banco de dados.
 		cppdb::transaction guard(sql);
-
-		debug("*** %s",__FUNCTION__);
-		for(auto query : queryes) {
-			query->store(sql, *this);
-		}
-
+		store(sql);
 		guard.commit();
 
  	} catch(const std::exception &e) {
@@ -94,19 +80,7 @@
  	return true;
  }
 
- const char * PDFImporter::Parser::operator [](const char *name) const {
 
- 				/// @brief Lista de valores extraídos do documento.
-	for(auto content : contents) {
-
-		if(!strcasecmp(content->getName().c_str(),name)) {
-			return content->c_str();
-		}
-
-	}
-
- 	return "";
- }
 
 
 

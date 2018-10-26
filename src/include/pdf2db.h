@@ -21,6 +21,7 @@
 	#include <cppdb/frontend.h>
 	#include <cstdio>
 	#include <iostream>
+	#include <iostream>
 
 	#ifdef DEBUG
 		#define trace( fmt, ... )	fprintf(stderr,"%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ );fflush(stderr)
@@ -34,6 +35,8 @@
 	using std::vector;
 	using std::string;
 	using XMLNode = pugi::xml_node;
+	using std::cout;
+	using std::endl;
 
 	extern char * chomp(char *str) noexcept;
 	extern char * chug (char *str) noexcept;
@@ -42,6 +45,10 @@
 	extern bool hasSuffix(const char *str, const char *suffix) noexcept;
 
 	namespace PDFImporter {
+
+		extern bool verbose;
+
+		class Query;
 
 		/// @brief Documento PDF já convertido para texto sem espaços.
 		class Document {
@@ -53,6 +60,8 @@
 
 			public:
 				Page() = default;
+
+				void get(const unsigned int line, std::vector<string> &text) const;
 
 			};
 
@@ -69,6 +78,7 @@
 				return getString(page,line).c_str();
 			}
 
+			void get(const unsigned int page, const unsigned int line, std::vector<string> &text) const;
 
 		};
 
@@ -90,39 +100,105 @@
 		};
 
 		/// @brief Valor extraido do documento.
-		class Content {
+		class Property {
 		private:
 
-			/// @brief Nome da propriedade
+			/// @brief Nome da propriedade.
 			string name;
 
-		protected:
-			Content(const XMLNode &node);
-
-			/// @brief De que página será extraída.
+			/// @brief De que página será extraída (0=Todas)?
 			unsigned int page;
 
+			/// @brief De que linha será extraída (0=Todas)?
+			unsigned int line;
+
+		protected:
+			/// @brief Valor da propriedade.
+			string value;
+
+			/// @brief Cria uma propriedade.
+			Property(const XMLNode &node);
+
 		public:
+			virtual ~Property() { }
 
-			virtual ~Content() { }
-
-			/// @brief Cria conteúdo de acordo com a descrição XML.
-			static Content * create(const XMLNode &node);
-
-			/// @brief Extrai conteúdo do documento.
-			virtual bool set(const Document &document) = 0;
-
-			/// @brief Reinicia o parser.
-			virtual void reset() = 0;
+			/// @brief Constrói propriedade pelo nó XML.
+			static Property * create(const XMLNode &node);
 
 			/// @brief Obtêm o nome do valor
 			const string & getName() const {
 				return this->name;
 			}
 
-			virtual const char * c_str() const = 0;
+			inline const char * c_str() const {
+				return value.c_str();
+			}
+
+			inline unsigned int getPage() const noexcept {
+				return page;
+			}
+
+			inline unsigned int getLine() const noexcept {
+				return line;
+			}
+
+			inline void clear() noexcept {
+				value.clear();
+			}
+
+			virtual void set(std::vector<string> &text) = 0;
 
 		};
+
+		/// &brief Parsers diversos.
+		namespace Parser {
+
+		    /// @brief Base para parsers.
+		    class Abstract {
+            private:
+
+                /// @brief "Pai" desse parser.
+                const Abstract *parent;
+
+            protected:
+
+                /// @brief Comandos SQL a executar.
+                std::vector<Query *> queryes;
+
+                /// @brief Meus filhos
+                std::vector<Abstract *> childs;
+
+                /// @brief Lista de valores extraídos do documento.
+                std::vector<Property *> properties;
+
+                Abstract(cppdb::session &sql, const XMLNode &node, const Abstract *parent = nullptr);
+                virtual ~Abstract();
+
+                void store(cppdb::session &sql);
+
+			public:
+                const char * operator [](const char *name) const;
+
+		    };
+
+		    /// @brief Parser para documento.
+		    class Document : public Abstract {
+            private:
+
+                /// @brief Lista de filtros para verificar se é um documento válido.
+                std::vector<Filter *> filters;
+
+            public:
+                Document(cppdb::session &sql, const XMLNode &node);
+                virtual ~Document();
+
+                /// @brief Faz o parse do documento.
+                bool set(cppdb::session &sql, const PDFImporter::Document &document);
+
+		    };
+
+
+		}
 
 		/// @brief Comando SQL já preparado.
 		class Query {
@@ -143,52 +219,9 @@
 			~Query();
 
 			/// @brief Armazena valores processados no banco.
-			void store(cppdb::session &sql, const Parser &parser);
+			void exec(cppdb::session &sql, const Parser::Abstract &parser);
 
 		};
-
-		/// &brief Parsers diversos.
-		namespace Parser {
-
-		    /// @brief Base para parsers.
-		    class Abstract {
-            private:
-
-                /// @brief "Pai" desse parser.
-                const Abstract *parent;
-
-                /// @brief Lista de valores extraídos do documento.
-                std::vector<Content *> contents;
-
-                /// @brief Comandos SQL a executar.
-                std::vector<Query *> queryes;
-
-            protected:
-                Abstract(cppdb::session &sql, const XMLNode &node, const Abstract *parent = nullptr);
-                virtual ~Abstract();
-
-                const char * operator [](const char *name) const;
-
-		    };
-
-		    /// @brief Parser para documento.
-		    class Document : public Abstract {
-            private:
-
-                /// @brief Lista de filtros para verificar se é um documento válido.
-                std::vector<Filter *> filters;
-
-            public:
-                Document(cppdb::session &sql, const XMLNode &node);
-                virtual ~Document();
-
-                /// @brief Faz o parse do documento.
-                bool set(cppdb::session &sql, const Document &document);
-
-		    };
-
-
-		}
 
 
 	}

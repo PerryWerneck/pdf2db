@@ -51,7 +51,7 @@
 
 
  /// @brief Armazena valores processados no banco.
- void PDFImporter::Query::store(cppdb::session &sql, const Parser &parser) {
+ void PDFImporter::Query::exec(cppdb::session &sql, const Parser::Abstract &parser) {
 
 	// Just in case.
 	st.reset();

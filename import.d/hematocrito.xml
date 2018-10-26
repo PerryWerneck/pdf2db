@@ -1,12 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-	Configuração para importação de exames
+	Declaração do parser para exame.
 
 -->
 
-<pdfimport>
+<pdf2db>
 
-	<procedure name='Hematócrito' type='exame'>
+	<document-parser name='Hematócrito'>
 
 		<filter page='1' line='1' type='text' value='^Clínica Prontovet' />
 		<filter page='1' line='4' type='text' value='^Hematócrito' />
@@ -84,9 +85,6 @@
 
 		<!-- Dados do exame -->
 
-		<property name='resultado' type='text-block' page='1' begin='^Resultado$' end='^Horário.*'>
-		</property>
-
 		<property name='conclusoes' type='text-block' page='1' begin='^Conclusões$' end='^Exame realizado o dia.*'>
 		</property>
 
@@ -96,9 +94,12 @@
 		<property name='horaexame' type='regex' page='1' expression='^Horário.*([0-9][0-9]:[0-9][0-9])'>
 		</property>
 
-		<!-- Resultados do exame -->
+		<!-- Resultados do exame ficam num parser menor que só processa um bloco do documento -->
+		<document-itens page='1' begin='^Resultado$' end='^Horário.*'>
 
-	</procedure>
+		</document-itens>
+
+	</document-parser>
 
 
-</pdfimport>
+</pdf2db>
