@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
 	int long_index =0;
 	int opt;
-	while((opt = getopt_long(argc, argv, "D:X:h", options, &long_index )) != -1) {
+	while((opt = getopt_long(argc, argv, "D:X:vh", options, &long_index )) != -1) {
 
 		switch(opt) {
 		case 'D':	// DBURI

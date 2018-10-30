@@ -112,6 +112,7 @@
 			document.get(property->getPage(),property->getLine(),text);
 
 			property->clear();
+			property->prepare(text);
 			property->set(text);
 
 		}

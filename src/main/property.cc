@@ -11,6 +11,7 @@
  */
 
  #include <pdf2db.h>
+ #include <climits>
  #include <regex>
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
@@ -19,6 +20,31 @@
  	this->name = node.attribute("name").as_string();
 	this->page = node.attribute("page").as_uint(0);
 	this->line = node.attribute("line").as_uint(0);
+
+	this->range.from = node.attribute("start-char").as_uint(1);
+	if(this->range.from == 0) {
+		throw EINVAL;
+	}
+
+	this->range.length = node.attribute("line-length").as_uint(UINT_MAX);
+
+ }
+
+ void PDFImporter::Property::prepare(std::vector<string> &text) {
+
+	for(auto line = text.begin(); line != text.end(); line++) {
+
+		if(this->range.from != 0 || this->range.length != UINT_MAX) {
+			string nl = line->substr(this->range.from-1,std::min((line->size() - (this->range.from-1)),this->range.length));
+			debug("%s:\n%s\n%s",this->name.c_str(),line->c_str(),nl.c_str());
+			line->assign(nl);
+		}
+
+		strip(*line);
+
+	}
+
+
  }
 
  PDFImporter::Property * PDFImporter::Property::create(const XMLNode &node) {
@@ -115,6 +141,38 @@
 
 	if(!strcasecmp(type,"text-block")) {
 		return new RegexBlockExtractor(node);
+	}
+
+	/// @brief Elemento para extrair um texto.
+	class TextExtractor : public Property {
+	private:
+
+	public:
+
+		TextExtractor(const XMLNode &node) : Property(node) {
+		}
+
+		virtual ~TextExtractor() {
+		}
+
+		void set(std::vector<string> &text) override {
+
+			for(auto line : text) {
+
+				if(!this->value.empty()) {
+					this->value += "\n";
+				}
+
+				this->value += line;
+
+			};
+
+		}
+
+	};
+
+	if(!strcasecmp(type,"text")) {
+		return new TextExtractor(node);
 	}
 
 	// Não consegui criar, erro.

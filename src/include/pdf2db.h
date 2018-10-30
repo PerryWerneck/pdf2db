@@ -112,6 +112,12 @@
 			/// @brief De que linha será extraída (0=Todas)?
 			unsigned int line;
 
+			/// @brief Pego só uma parte da linha?
+			struct {
+				size_t from;	/// @brief Extrai a partir de qual caractere?
+				size_t length;	/// @brief Quantos caracteres?
+			} range;
+
 		protected:
 			/// @brief Valor da propriedade.
 			string value;
@@ -145,6 +151,8 @@
 			inline void clear() noexcept {
 				value.clear();
 			}
+
+			void prepare(std::vector<string> &text);
 
 			virtual void set(std::vector<string> &text) = 0;
 

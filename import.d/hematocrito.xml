@@ -94,8 +94,28 @@
 		<property name='horaexame' type='regex' page='1' expression='^Horário.*([0-9][0-9]:[0-9][0-9])'>
 		</property>
 
+		<property name='test-5chars' type='text' page='1' line='1' line-length='5'>
+		</property>
+
+		<property name='test2-from5' type='text' page='1' line='1' start-char='5'>
+		</property>
+
+		<property name='test2-4' type='text' page='1' line='1' start-char='2' line-length='3'>
+		</property>
+
 		<!-- Resultados do exame ficam num parser menor que só processa um bloco do documento -->
 		<document-itens page='1' begin='^Resultado$' end='^Horário.*'>
+
+			<!-- Descrição está nas primeiras 40 colunas -->
+			<property name='description' type='text' start-char='1' line-length='40'/>
+
+			<!-- property name='value' type='number' start-char='41' decimal-point=','/ -->
+
+<!--
+xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.
+Hematócrito                                                            22 %
+Proteínas Totais Plasmáticas                                        6,0 mg/dL
+-->
 
 		</document-itens>
 
