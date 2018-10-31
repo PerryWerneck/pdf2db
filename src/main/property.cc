@@ -13,6 +13,7 @@
  #include <pdf2db.h>
  #include <climits>
  #include <regex>
+ #include <ctime>
 
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
@@ -21,7 +22,10 @@
  	this->name = node.attribute("name").as_string();
 	this->page = node.attribute("page").as_uint(0);
 	this->line = node.attribute("line").as_uint(0);
-	this->format = text;
+	this->type = text;
+
+	this->format.input = node.attribute("input-format").as_string("");
+	this->format.output = node.attribute("output-format").as_string("");
 
 	// Obtém o formato.
 	static const char * formats[] = { "text", "timestamp" };
@@ -29,7 +33,7 @@
 
 	for(size_t f = 0; f < (sizeof(formats)/sizeof(formats[0]));f++) {
 		if(!strcasecmp(formats[f],format)) {
-			this->format = (Format) f;
+			this->type = (Format) f;
 			break;
 		}
 	}
@@ -63,7 +67,7 @@
  PDFImporter::Property * PDFImporter::Property::create(const XMLNode &node) {
 
 	/// @brief Tipo da propriedade que será criada.
-	auto type = node.attribute("type").as_string("regex");
+	auto parser = node.attribute("parser").as_string("regex");
 
 	/// @brief Elemento para extrair um valor com base numa expressão regular.
 	class RegexExtractedProperty : public Property {
@@ -99,7 +103,7 @@
 
 	};
 
-	if(!strcasecmp(type,"regex")) {
+	if(!strcasecmp(parser,"regex")) {
 		return new RegexExtractedProperty(node);
 	}
 
@@ -153,7 +157,7 @@
 
 	};
 
-	if(!strcasecmp(type,"text-block")) {
+	if(!strcasecmp(parser,"text-block")) {
 		return new RegexBlockExtractor(node);
 	}
 
@@ -188,7 +192,7 @@
 
 	};
 
-	if(!strcasecmp(type,"text")) {
+	if(!strcasecmp(parser,"text")) {
 		return new TextExtractor(node);
 	}
 
@@ -201,6 +205,26 @@
  void PDFImporter::Property::setValue(const char *value) {
 
  	this->value = value;
+
+ 	if(!(format.input.empty() && format.output.empty())) {
+
+		if(type == timestamp) {
+
+			struct tm tm;
+			memset(&tm,0,sizeof(tm));
+
+			strptime(value, format.input.c_str(), &tm);
+
+			debug("%s original value=\"%s\"",getName().c_str(),value);
+
+			char * buffer = new char[4096];
+			strftime(buffer, 4096, format.output.c_str(), &tm);
+			this->value = buffer;
+			delete[] buffer;
+
+		}
+
+ 	}
 
 	if(PDFImporter::verbose) {
 		cout << getName() << "=\"" << this->value << "\"" << endl;

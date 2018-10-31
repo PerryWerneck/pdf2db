@@ -9,14 +9,14 @@
 
 	<document-parser name='Hematócrito'>
 
-		<filter page='1' line='1' type='text' value='^Clínica Prontovet' />
-		<filter page='1' line='4' type='text' value='^Hematócrito' />
+		<filter page='1' line='1' parser='text' value='^Clínica Prontovet' />
+		<filter page='1' line='4' parser='text' value='^Hematócrito' />
 
 		<!-- Informações do tutor -->
-		<property name='tutor' type='regex' page='1' line='9' expression='(.*)-.*'>
+		<property name='tutor' parser='regex' page='1' line='9' expression='(.*)-.*'>
 		</property>
 
-		<property name='nametutor' type='regex' page='1' line='9' expression='.*-(.*)'>
+		<property name='nametutor' parser='regex' page='1' line='9' expression='.*-(.*)'>
 		</property>
 
 		<sql name='idtutor'>
@@ -31,7 +31,7 @@
 
 		<!-- Informações para atualização de tabelas -->
 
-		<property name='especie' type='regex' page='1' expression='^Espécie:(.*)Sexo.*'>
+		<property name='especie' parser='regex' page='1' expression='^Espécie:(.*)Sexo.*'>
 		</property>
 
 		<sql name='idespecie' >
@@ -44,7 +44,7 @@
 					idespecie=LAST_INSERT_ID(idespecie);
 		</sql>
 
-		<property name='raca' type='regex' page='1' expression='^Raça:(.*)Idade.*'>
+		<property name='raca' parser='regex' page='1' expression='^Raça:(.*)Idade.*'>
 		</property>
 
 		<sql name='idraca'>
@@ -58,13 +58,13 @@
 		</sql>
 
 		<!-- Informações do animal -->
-		<property name='animal' type='regex' page='1' expression='^Animal:(.*)-.*'>
+		<property name='animal' parser='regex' page='1' expression='^Animal:(.*)-.*'>
 		</property>
 
-		<property name='genero' type='regex' page='1' expression='.*Sexo:(.*)$'>
+		<property name='genero' parser='regex' page='1' expression='.*Sexo:(.*)$'>
 		</property>
 
-		<property name='nomeanimal' type='regex' page='1' expression='^Animal:.*-(.*)Peso.*'>
+		<property name='nomeanimal' parser='regex' page='1' expression='^Animal:.*-(.*)Peso.*'>
 		</property>
 
 		<sql name='idanimal'>
@@ -85,31 +85,47 @@
 
 		<!-- Dados do exame -->
 
-		<property name='conclusoes' type='text-block' page='1' begin='^Conclusões$' end='^Exame realizado o dia.*'>
+		<property name='conclusoes' parser='text-block' page='1' begin='^Conclusões$' end='^Exame realizado o dia.*'>
 		</property>
 
-		<property name='dataexame' type='regex' page='1' expression='^Exame realizado.*([0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]).'>
+		<property name='dataexame' parser='regex' page='1' format='timestamp' expression='^Exame realizado.*([0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]).' input-format='%d/%m/%Y' output-format='%Y-%m-%d'>
 		</property>
 
-		<property name='horaexame' type='regex' page='1' expression='^Horário.*([0-9][0-9]:[0-9][0-9])'>
+		<property name='horaexame' parser='regex' page='1' expression='^Horário.*([0-9][0-9]:[0-9][0-9])'>
 		</property>
 
-		<property name='test-5chars' type='text' page='1' line='1' line-length='5'>
-		</property>
+		<sql name='idprocedimentos'>
+			INSERT
+				INTO `procedimentos`
+					(`tipo`, `nome`)
+				VALUES
+					('Exame', 'Hematócrito')
+				ON DUPLICATE KEY UPDATE
+					idprocedimentos=LAST_INSERT_ID(idprocedimentos);
+		</sql>
 
-		<property name='test2-from5' type='text' page='1' line='1' start-char='5'>
-		</property>
+		<sql name='idprocedimento'>
 
-		<property name='test2-4' type='text' page='1' line='1' start-char='2' line-length='3'>
-		</property>
+			INSERT
+				INTO `procedimento`
+					(`idanimal`, `idprocedimentos`, `timestamp`, `observacao`)
+				VALUES (
+					${idanimal},
+					${idprocedimentos},
+					concat(${dataexame},' ',${horaexame}),
+					${conclusoes}
+				);
+
+		</sql>
+
 
 		<!-- Resultados do exame ficam num parser menor que só processa um bloco do documento -->
 		<document-itens page='1' begin='^Resultado$' end='^Horário.*'>
 
 			<!-- Descrição está nas primeiras 40 colunas -->
-			<property name='description' type='text' start-char='1' line-length='40'/>
+			<property name='description' parser='text' start-char='1' line-length='40'/>
 
-			<!-- property name='value' type='number' start-char='41' decimal-point=','/ -->
+			<!-- property name='value' parser='number' start-char='41' decimal-point=','/ -->
 
 <!--
 xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.

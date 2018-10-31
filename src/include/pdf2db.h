@@ -110,7 +110,7 @@
 			enum Format {
 				text,
 				timestamp
-			} format;
+			} type;
 
 			/// @brief De que página será extraída (0=Todas)?
 			unsigned int page;
@@ -126,6 +126,17 @@
 
 			/// @brief Valor da propriedade.
 			string value;
+
+			/// @brief Formatos para conversão.
+			struct {
+
+				/// @brief Máscara para conversão de valor de entrada.
+				string input;
+
+				/// @brief Máscara para geração do valor de saída.
+				string output;
+
+			} format;
 
 		protected:
 
