@@ -24,7 +24,63 @@
   	}
 
   	for(auto query = node.child("sql"); query; query = query.next_sibling("sql")) {
-		queryes.push_back(new Query(sql,query));
+
+		const char *name = query.attribute("name").as_string();
+
+		if(!*name) {
+
+			// Query simples, sem propriedade
+			queryes.push_back(new Query(sql,query));
+
+		} else {
+
+			// Precisa guardar o ID da query, cria query e propriedade.
+
+			class IDProperty : public Property {
+			public:
+				IDProperty(const XMLNode &node) : Property(node) {
+				}
+
+				virtual ~IDProperty() {
+				}
+
+				inline void set(Query *qry) {
+					this->value = std::to_string(qry->getID());
+					debug("%s=%s",getName().c_str(),this->value.c_str());
+				}
+
+				void set(std::vector<string> &text) {
+				}
+
+			};
+
+			class IDQuery : public Query {
+			private:
+				IDProperty * prop;
+
+			public:
+				IDQuery(IDProperty *prop, cppdb::session &sql, const XMLNode &node) : Query(sql, node) {
+					this->prop = prop;
+				}
+
+				virtual ~IDQuery() {
+				}
+
+				void exec(cppdb::session &sql, const Parser::Abstract &parser) override {
+
+					Query::exec(sql,parser);
+					prop->set(this);
+
+				}
+
+			};
+
+			auto prop = new IDProperty(query);
+			properties.push_back(prop);
+			queryes.push_back(new IDQuery(prop,sql,query));
+
+		}
+
   	}
 
   	//

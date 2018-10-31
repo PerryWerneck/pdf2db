@@ -227,10 +227,15 @@
 
 		public:
 			Query(cppdb::session &sql, const XMLNode &node);
-			~Query();
+			virtual ~Query();
 
 			/// @brief Armazena valores processados no banco.
-			void exec(cppdb::session &sql, const Parser::Abstract &parser);
+			virtual void exec(cppdb::session &sql, const Parser::Abstract &parser);
+
+			/// @brief Obtêm valor inserido
+			inline long long getID() {
+				return st.last_insert_id();
+			}
 
 		};
 

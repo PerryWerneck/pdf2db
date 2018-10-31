@@ -13,18 +13,18 @@
 		<filter page='1' line='4' type='text' value='^Hematócrito' />
 
 		<!-- Informações do tutor -->
-		<property name='idtutor' type='regex' page='1' line='9' expression='(.*)-.*'>
+		<property name='tutor' type='regex' page='1' line='9' expression='(.*)-.*'>
 		</property>
 
 		<property name='nametutor' type='regex' page='1' line='9' expression='.*-(.*)'>
 		</property>
 
-		<sql>
+		<sql name='idtutor'>
 			INSERT
 				INTO `tutor`
 					(`identificacao`,`name`)
 				VALUES
-					(${idtutor}, ${nametutor})
+					(${tutor}, ${nametutor})
 				ON DUPLICATE KEY UPDATE
 					idtutor=LAST_INSERT_ID(idtutor);
 		</sql>
@@ -34,7 +34,7 @@
 		<property name='especie' type='regex' page='1' expression='^Espécie:(.*)Sexo.*'>
 		</property>
 
-		<sql>
+		<sql name='idespecie' >
 			INSERT
 				INTO `especie`
 					(`name`)
@@ -47,7 +47,7 @@
 		<property name='raca' type='regex' page='1' expression='^Raça:(.*)Idade.*'>
 		</property>
 
-		<sql>
+		<sql name='idraca'>
 			INSERT
 				INTO `raca`
 					(`description`)
@@ -58,7 +58,7 @@
 		</sql>
 
 		<!-- Informações do animal -->
-		<property name='idanimal' type='regex' page='1' expression='^Animal:(.*)-.*'>
+		<property name='animal' type='regex' page='1' expression='^Animal:(.*)-.*'>
 		</property>
 
 		<property name='genero' type='regex' page='1' expression='.*Sexo:(.*)$'>
@@ -67,15 +67,15 @@
 		<property name='nomeanimal' type='regex' page='1' expression='^Animal:.*-(.*)Peso.*'>
 		</property>
 
-		<sql>
+		<sql name='idanimal'>
 			INSERT
 				INTO `animal`
 					(`idtutor`, `idespecie`, `idraca`, `identificacao`, `name`, `genero`)
 				VALUES (
-					(select idtutor from tutor where tutor.identificacao=${idtutor} limit 1),
-					(select idespecie from especie where especie.name=${especie} limit 1),
-					(select idraca from raca where raca.description=${raca} limit 1),
-					${idanimal},
+					${idtutor},
+					${idespecie},
+					${idraca},
+					${animal},
 					lower(${nomeanimal}),
 					lower(${genero})
 				)

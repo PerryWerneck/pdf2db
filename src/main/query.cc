@@ -53,7 +53,7 @@
  /// @brief Armazena valores processados no banco.
  void PDFImporter::Query::exec(cppdb::session &sql, const Parser::Abstract &parser) {
 
-	// Just in case.
+	// Clear last results.
 	st.reset();
 
 	// Faz o bind dos valores.
@@ -79,9 +79,6 @@
 	// Executa e limpa para o próximo
 	debug("Executing\n%s",text.c_str());
 	st.exec();
-
-	debug("%s: Reseting...",__FUNCTION__);
-	st.reset();
 
  }
 
