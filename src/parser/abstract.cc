@@ -45,8 +45,8 @@
 				}
 
 				inline void set(Query *qry) {
-					this->value = std::to_string(qry->getID());
-					debug("%s=%s",getName().c_str(),this->value.c_str());
+					setValue(std::to_string(qry->getID()));
+					debug("%s=%s",getName().c_str(),this->c_str());
 				}
 
 				void set(std::vector<string> &text) {

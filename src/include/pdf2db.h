@@ -106,6 +106,12 @@
 			/// @brief Nome da propriedade.
 			string name;
 
+			/// @brief Formato dos dados
+			enum Format {
+				text,
+				timestamp
+			} format;
+
 			/// @brief De que página será extraída (0=Todas)?
 			unsigned int page;
 
@@ -118,9 +124,17 @@
 				size_t length;	/// @brief Quantos caracteres?
 			} range;
 
-		protected:
 			/// @brief Valor da propriedade.
 			string value;
+
+		protected:
+
+			/// @brief Define o valor da propriedade.
+			void setValue(const char *value);
+
+			inline void setValue(const string &value) {
+				setValue(value.c_str());
+			}
 
 			/// @brief Cria uma propriedade.
 			Property(const XMLNode &node);

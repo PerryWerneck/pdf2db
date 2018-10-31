@@ -1,7 +1,7 @@
 /**
- * @file src/main/contents.cc
+ * @file src/main/property.cc
  *
- * @brief Implementa extratores de conteúdo.
+ * @brief Implementa objeto contendo um valor extraído do documento.
  *
  * @author perry.werneck@gmail.com
  *
@@ -17,10 +17,24 @@
 /*---[ Implement ]----------------------------------------------------------------------------------*/
 
  PDFImporter::Property::Property(const XMLNode &node) {
+
  	this->name = node.attribute("name").as_string();
 	this->page = node.attribute("page").as_uint(0);
 	this->line = node.attribute("line").as_uint(0);
+	this->format = text;
 
+	// Obtém o formato.
+	static const char * formats[] = { "text", "timestamp" };
+	const char *format = node.attribute("format").as_string(formats[0]);
+
+	for(size_t f = 0; f < (sizeof(formats)/sizeof(formats[0]));f++) {
+		if(!strcasecmp(formats[f],format)) {
+			this->format = (Format) f;
+			break;
+		}
+	}
+
+	// Extrai parte da linha?
 	this->range.from = node.attribute("start-char").as_uint(1);
 	if(this->range.from == 0) {
 		throw EINVAL;
@@ -36,7 +50,6 @@
 
 		if(this->range.from != 0 || this->range.length != UINT_MAX) {
 			string nl = line->substr(this->range.from-1,std::min((line->size() - (this->range.from-1)),this->range.length));
-			debug("%s:\n%s\n%s",this->name.c_str(),line->c_str(),nl.c_str());
 			line->assign(nl);
 		}
 
@@ -73,11 +86,9 @@
 
 				if(std::regex_search(line, match, this->expression)) {
 
-					this->value = match.str(1).c_str();
-					strip(this->value);
-					if(PDFImporter::verbose) {
-						cout << getName() << "=\"" << this->value << "\"" << endl;
-					}
+					string value = match.str(1).c_str();
+					strip(value);
+					setValue(value);
 					break;
 
 				}
@@ -112,6 +123,7 @@
 
 			bool loading = false;
 
+			string value;
 			for(auto line : text) {
 
 				if(loading) {
@@ -123,17 +135,19 @@
 					}
 
 					debug("[%s]",line.c_str());
-					if(!this->value.empty()) {
-						this->value += "\n";
+					if(!value.empty()) {
+						value += "\n";
 					}
-					this->value += line;
+					value += line;
 
 				} else if(regex_match(line,from)) {
 					debug("%s: Achei inicio (%s)",getName().c_str(),line.c_str());
 					loading = true;
 				}
 
-			};
+			}
+
+			setValue(value);
 
 		}
 
@@ -157,15 +171,18 @@
 
 		void set(std::vector<string> &text) override {
 
+			string value;
 			for(auto line : text) {
 
-				if(!this->value.empty()) {
-					this->value += "\n";
+				if(!value.empty()) {
+					value += "\n";
 				}
 
-				this->value += line;
+				value += line;
 
 			};
+
+			setValue(value);
 
 		}
 
@@ -180,5 +197,15 @@
 
  }
 
+ /// @brief Define o valor da propriedade.
+ void PDFImporter::Property::setValue(const char *value) {
+
+ 	this->value = value;
+
+	if(PDFImporter::verbose) {
+		cout << getName() << "=\"" << this->value << "\"" << endl;
+	}
+
+ }
 
 
